@@ -1,0 +1,13 @@
+# Auto reloading minimap on enabling module
+autoReloadMiniMap: true
+# Add max points for each group (<!> case sensitive <!>)
+groups:
+  default: 0
+  vip: 3
+  premium: 5
+  mvp: 7
+  admin: 10
+
+database:
+  type: "sqlite"
+  database: "database"

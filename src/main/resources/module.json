@@ -1,0 +1,8 @@
+{
+  "name": "WayPoints",
+  "main": "org.devcloud.waypoints.Main",
+  "description": "Custom WayPoints",
+  "version": "2.0",
+  "author": "BrainRTP",
+  "depend": ["Vault"]
+}
