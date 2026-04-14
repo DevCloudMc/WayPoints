@@ -1,0 +1,24 @@
+build:
+  maxIssues: 0
+  weights:
+    complexity: 2
+
+style:
+  MaxLineLength:
+    maxLineLength: 140
+  MagicNumber:
+    ignoreNumbers: ['-1', '0', '1', '2', '100', '1000']
+  ReturnCount:
+    max: 5
+
+complexity:
+  LongMethod:
+    threshold: 80
+  TooManyFunctions:
+    thresholdInClasses: 25
+  ComplexCondition:
+    threshold: 5
+
+naming:
+  FunctionNaming:
+    excludes: ['**/test/**']

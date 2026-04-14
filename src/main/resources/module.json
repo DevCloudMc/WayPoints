@@ -1,8 +1,8 @@
 {
   "name": "WayPoints",
-  "main": "org.devcloud.waypoints.Main",
-  "description": "Custom WayPoints",
-  "version": "2.0",
-  "author": "BrainRTP",
-  "depend": ["Vault"]
+  "main": "org.devcloud.waypoints.WayPointsModule",
+  "description": "Personal and global waypoints for Cartographer2 minimaps.",
+  "author": "DevCloud",
+  "version": "2.0.0",
+  "website": "https://github.com/DevCloudMc/WayPoints"
 }
