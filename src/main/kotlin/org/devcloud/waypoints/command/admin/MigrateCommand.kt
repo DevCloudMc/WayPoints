@@ -53,12 +53,14 @@ class MigrateCommand(private val ctx: WayPointsBootstrap) {
             when (from) {
                 StorageType.SQLITE ->
                     SqliteStorageBackend(dataFolder.resolve(ctx.config.sqliteFile))
+
                 StorageType.YAML -> YamlStorageBackend(dataFolder.resolve(ctx.config.yamlFile))
             }
         val target: StorageBackend =
             when (to) {
                 StorageType.SQLITE ->
                     SqliteStorageBackend(dataFolder.resolve(ctx.config.sqliteFile))
+
                 StorageType.YAML -> YamlStorageBackend(dataFolder.resolve(ctx.config.yamlFile))
             }
 

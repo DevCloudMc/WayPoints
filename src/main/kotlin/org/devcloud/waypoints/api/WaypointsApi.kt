@@ -1,6 +1,6 @@
 package org.devcloud.waypoints.api
 
-import java.util.UUID
+import java.util.*
 import org.devcloud.waypoints.domain.Waypoint
 
 /**

@@ -1,6 +1,6 @@
 package org.devcloud.waypoints.storage.sqlite
 
-import java.util.UUID
+import java.util.*
 import java.util.concurrent.CompletableFuture
 import org.devcloud.waypoints.domain.PlayerProfile
 import org.devcloud.waypoints.domain.VisibilityState
@@ -30,9 +30,10 @@ class SqlitePlayerRepository(private val pool: ConnectionPool) : PlayerRepositor
         }
 
     override fun saveProfile(profile: PlayerProfile): CompletableFuture<Unit> =
-        pool.submit { c ->
-            c.prepareStatement(
-                    """
+        pool
+            .submit { c ->
+                c.prepareStatement(
+                        """
                 INSERT INTO player_profiles (uuid, hide_personal, hide_global, hide_shared)
                 VALUES (?, ?, ?, ?)
                 ON CONFLICT(uuid) DO UPDATE SET
@@ -40,36 +41,36 @@ class SqlitePlayerRepository(private val pool: ConnectionPool) : PlayerRepositor
                     hide_global   = excluded.hide_global,
                     hide_shared   = excluded.hide_shared
                 """
-                        .trimIndent()
-                )
-                .use { ps ->
-                    ps.setString(1, profile.uuid.toString())
-                    ps.setInt(
-                        2,
-                        if (profile.visibility.hidePersonal) {
-                            1
-                        } else {
-                            0
-                        },
+                            .trimIndent()
                     )
-                    ps.setInt(
-                        3,
-                        if (profile.visibility.hideGlobal) {
-                            1
-                        } else {
-                            0
-                        },
-                    )
-                    ps.setInt(
-                        4,
-                        if (profile.visibility.hideShared) {
-                            1
-                        } else {
-                            0
-                        },
-                    )
-                    ps.executeUpdate()
-                    Unit
-                }
-        }
+                    .use { ps ->
+                        ps.setString(1, profile.uuid.toString())
+                        ps.setInt(
+                            2,
+                            if (profile.visibility.hidePersonal) {
+                                1
+                            } else {
+                                0
+                            },
+                        )
+                        ps.setInt(
+                            3,
+                            if (profile.visibility.hideGlobal) {
+                                1
+                            } else {
+                                0
+                            },
+                        )
+                        ps.setInt(
+                            4,
+                            if (profile.visibility.hideShared) {
+                                1
+                            } else {
+                                0
+                            },
+                        )
+                        ps.executeUpdate()
+                    }
+            }
+            .thenApply {}
 }

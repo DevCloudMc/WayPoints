@@ -2,7 +2,7 @@ package org.devcloud.waypoints.storage.sqlite
 
 import java.sql.ResultSet
 import java.time.Instant
-import java.util.UUID
+import java.util.*
 import org.devcloud.waypoints.domain.IconRegistry
 import org.devcloud.waypoints.domain.PlayerProfile
 import org.devcloud.waypoints.domain.VisibilityState

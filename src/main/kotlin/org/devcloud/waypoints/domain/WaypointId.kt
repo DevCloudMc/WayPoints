@@ -1,6 +1,6 @@
 package org.devcloud.waypoints.domain
 
-import java.util.UUID
+import java.util.*
 
 /**
  * Opaque, stable identifier for a [Waypoint].

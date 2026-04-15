@@ -1,7 +1,7 @@
 package org.devcloud.waypoints.domain
 
 import java.time.Instant
-import java.util.UUID
+import java.util.*
 import org.bukkit.map.MapCursor
 
 /**
@@ -60,6 +60,7 @@ data class Waypoint(
         when (scope) {
             WaypointScope.GLOBAL ->
                 require(owner == null) { "Global waypoint must not have an owner" }
+
             WaypointScope.PERSONAL ->
                 require(owner != null) { "Personal waypoint must have an owner" }
         }

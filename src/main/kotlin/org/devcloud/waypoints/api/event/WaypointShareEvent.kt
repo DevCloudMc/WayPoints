@@ -1,6 +1,6 @@
 package org.devcloud.waypoints.api.event
 
-import java.util.UUID
+import java.util.*
 import org.bukkit.command.CommandSender
 import org.bukkit.event.HandlerList
 import org.devcloud.waypoints.domain.Waypoint

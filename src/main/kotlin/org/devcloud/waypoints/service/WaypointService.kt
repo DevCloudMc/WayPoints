@@ -2,7 +2,7 @@ package org.devcloud.waypoints.service
 
 import java.time.Clock
 import java.time.Instant
-import java.util.UUID
+import java.util.*
 import java.util.concurrent.CompletableFuture
 import java.util.concurrent.ConcurrentHashMap
 import org.bukkit.map.MapCursor
@@ -24,19 +24,23 @@ class WaypointService(
     private val globalCache = ConcurrentHashMap<String, Waypoint>()
 
     fun warmGlobals(): CompletableFuture<Unit> =
-        storage.waypoints.listGlobal().thenApply { list ->
-            globalCache.clear()
-            list.forEach { globalCache[it.name] = it }
-            Unit
-        }
+        storage.waypoints
+            .listGlobal()
+            .thenAccept { list ->
+                globalCache.clear()
+                list.forEach { globalCache[it.name] = it }
+            }
+            .thenApply {}
 
     fun warmPlayer(owner: UUID): CompletableFuture<Unit> =
-        storage.waypoints.listByOwner(owner).thenApply { list ->
-            val map = ConcurrentHashMap<String, Waypoint>()
-            list.forEach { map[it.name] = it }
-            personalCache[owner] = map
-            Unit
-        }
+        storage.waypoints
+            .listByOwner(owner)
+            .thenAccept { list ->
+                val map = ConcurrentHashMap<String, Waypoint>()
+                list.forEach { map[it.name] = it }
+                personalCache[owner] = map
+            }
+            .thenApply {}
 
     fun forgetPlayer(owner: UUID) {
         personalCache.remove(owner)

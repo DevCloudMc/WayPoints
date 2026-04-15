@@ -1,6 +1,6 @@
 package org.devcloud.waypoints.service
 
-import java.util.UUID
+import java.util.*
 import java.util.concurrent.CompletableFuture
 import java.util.concurrent.ConcurrentHashMap
 import org.devcloud.waypoints.domain.PlayerProfile
@@ -11,10 +11,10 @@ class VisibilityService(private val storage: StorageBackend) {
     private val cache = ConcurrentHashMap<UUID, VisibilityState>()
 
     fun warm(uuid: UUID): CompletableFuture<Unit> =
-        storage.players.loadProfile(uuid).thenApply { p ->
-            cache[uuid] = p.visibility
-            Unit
-        }
+        storage.players
+            .loadProfile(uuid)
+            .thenAccept { p -> cache[uuid] = p.visibility }
+            .thenApply {}
 
     fun forget(uuid: UUID) {
         cache.remove(uuid)

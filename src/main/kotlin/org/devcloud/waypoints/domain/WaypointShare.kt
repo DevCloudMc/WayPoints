@@ -1,7 +1,7 @@
 package org.devcloud.waypoints.domain
 
 import java.time.Instant
-import java.util.UUID
+import java.util.*
 
 /**
  * A grant of read-only access to a personal [Waypoint] for another player.

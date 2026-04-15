@@ -46,6 +46,7 @@ class GlobalCreateCommand(private val ctx: WayPointsBootstrap) {
                             ctx.waypointService.deleteGlobal(name)
                         }
                     }
+
                     is Outcome.Err -> {
                         ctx.messenger.send(player, CommandSupport.renderError(ctx, res.error))
                     }

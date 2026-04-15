@@ -2,7 +2,7 @@ package org.devcloud.waypoints.service
 
 import java.time.Clock
 import java.time.Instant
-import java.util.UUID
+import java.util.*
 import java.util.concurrent.CompletableFuture
 import java.util.concurrent.ConcurrentHashMap
 import org.devcloud.waypoints.domain.WaypointId
@@ -16,12 +16,14 @@ class ShareService(
     private val cache = ConcurrentHashMap<UUID, MutableSet<WaypointId>>()
 
     fun warmFor(target: UUID): CompletableFuture<Unit> =
-        storage.shares.listSharedWith(target).thenApply { list ->
-            val set = ConcurrentHashMap.newKeySet<WaypointId>()
-            list.forEach { set += it.waypointId }
-            cache[target] = set
-            Unit
-        }
+        storage.shares
+            .listSharedWith(target)
+            .thenAccept { list ->
+                val set = ConcurrentHashMap.newKeySet<WaypointId>()
+                list.forEach { set += it.waypointId }
+                cache[target] = set
+            }
+            .thenApply {}
 
     fun forget(target: UUID) {
         cache.remove(target)

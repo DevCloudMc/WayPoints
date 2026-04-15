@@ -4,7 +4,7 @@ import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.StandardCopyOption
 import java.time.Instant
-import java.util.UUID
+import java.util.*
 import java.util.concurrent.CompletableFuture
 import java.util.concurrent.Executors
 import org.bukkit.configuration.file.YamlConfiguration
@@ -60,7 +60,6 @@ class YamlStorageBackend(private val file: Path) : StorageBackend {
             override fun save(wp: Waypoint) = submit {
                 cache = cache.copy(waypoints = cache.waypoints.filterNot { it.id == wp.id } + wp)
                 persist()
-                Unit
             }
 
             override fun delete(id: WaypointId) = submit {
@@ -155,7 +154,6 @@ class YamlStorageBackend(private val file: Path) : StorageBackend {
                         profiles = cache.profiles.filterNot { it.uuid == profile.uuid } + profile
                     )
                 persist()
-                Unit
             }
         }
 
@@ -166,7 +164,6 @@ class YamlStorageBackend(private val file: Path) : StorageBackend {
         } else {
             persist()
         }
-        Unit
     }
 
     override fun exportAll(): CompletableFuture<StorageSnapshot> = submit { cache }
@@ -174,7 +171,6 @@ class YamlStorageBackend(private val file: Path) : StorageBackend {
     override fun importAll(snapshot: StorageSnapshot): CompletableFuture<Unit> = submit {
         cache = snapshot
         persist()
-        Unit
     }
 
     override fun close() {

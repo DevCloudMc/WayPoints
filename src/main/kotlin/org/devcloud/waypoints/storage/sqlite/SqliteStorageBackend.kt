@@ -22,11 +22,7 @@ class SqliteStorageBackend(dbPath: Path) : StorageBackend {
     override val shares = SqliteShareRepository(pool)
     override val players = SqlitePlayerRepository(pool)
 
-    override fun init(): CompletableFuture<Unit> =
-        pool.submit { c ->
-            SqliteSchema.apply(c)
-            Unit
-        }
+    override fun init(): CompletableFuture<Unit> = pool.submit { c -> SqliteSchema.apply(c) }
 
     override fun exportAll(): CompletableFuture<StorageSnapshot> =
         pool.submit { c ->
@@ -52,7 +48,7 @@ class SqliteStorageBackend(dbPath: Path) : StorageBackend {
         snapshot.waypoints.forEach { futures += waypoints.save(it) }
         snapshot.shares.forEach { futures += shares.add(it) }
         snapshot.profiles.forEach { futures += players.saveProfile(it) }
-        return CompletableFuture.allOf(*futures.toTypedArray()).thenApply { Unit }
+        return CompletableFuture.allOf(*futures.toTypedArray()).thenApply {}
     }
 
     override fun close() = pool.close()

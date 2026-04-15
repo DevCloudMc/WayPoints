@@ -1,6 +1,6 @@
 package org.devcloud.waypoints.storage
 
-import java.util.UUID
+import java.util.*
 import java.util.concurrent.CompletableFuture
 import org.devcloud.waypoints.domain.WaypointId
 import org.devcloud.waypoints.domain.WaypointShare

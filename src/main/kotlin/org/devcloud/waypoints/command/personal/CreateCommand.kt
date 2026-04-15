@@ -86,6 +86,7 @@ class CreateCommand(private val ctx: WayPointsBootstrap) {
                             ctx.waypointService.deletePersonal(player.uniqueId, res.value.name)
                         }
                     }
+
                     is Outcome.Err -> {
                         ctx.messenger.send(player, CommandSupport.renderError(ctx, res.error))
                     }

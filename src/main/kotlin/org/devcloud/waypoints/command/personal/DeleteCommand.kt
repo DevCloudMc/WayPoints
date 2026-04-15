@@ -37,6 +37,7 @@ class DeleteCommand(private val ctx: WayPointsBootstrap) {
                             player,
                             ctx.lang.message("waypoint-deleted", "name" to name),
                         )
+
                     is Outcome.Err ->
                         ctx.messenger.send(player, CommandSupport.renderError(ctx, res.error))
                 }

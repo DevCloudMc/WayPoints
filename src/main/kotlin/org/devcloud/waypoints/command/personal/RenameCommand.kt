@@ -46,6 +46,7 @@ class RenameCommand(private val ctx: WayPointsBootstrap) {
                             player,
                             ctx.lang.message("waypoint-renamed", "old" to old, "new" to new),
                         )
+
                     is Outcome.Err ->
                         ctx.messenger.send(player, CommandSupport.renderError(ctx, res.error))
                 }

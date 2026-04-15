@@ -43,6 +43,7 @@ class GlobalRenameCommand(private val ctx: WayPointsBootstrap) {
                             sender,
                             ctx.lang.message("global-renamed", "old" to old, "new" to new),
                         )
+
                     is Outcome.Err ->
                         ctx.messenger.send(sender, CommandSupport.renderError(ctx, res.error))
                 }

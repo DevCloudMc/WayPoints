@@ -3,6 +3,8 @@ package org.devcloud.waypoints.domain
 import org.bukkit.NamespacedKey
 import org.bukkit.Registry
 import org.bukkit.map.MapCursor
+import org.devcloud.waypoints.domain.IconRegistry.parse
+import org.devcloud.waypoints.domain.IconRegistry.serialize
 
 /**
  * Lookup and serialisation helpers for [MapCursor.Type] that avoid the deprecated, enum-era surface
