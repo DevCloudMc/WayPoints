@@ -30,12 +30,9 @@ class WaypointWorldCursorProvider(
         val playerLoc = player.location
 
         if (!visibility.hidePersonal) {
-            for (wp in waypointService.listOwned(player.uniqueId)) addCursor(
-                out,
-                wp,
-                playerLoc,
-                visibility,
-            )
+            for (wp in waypointService.listOwned(player.uniqueId)) {
+                addCursor(out, wp, playerLoc, visibility)
+            }
         }
         if (!visibility.hideGlobal) {
             for (wp in waypointService.listGlobals()) addCursor(out, wp, playerLoc, visibility)

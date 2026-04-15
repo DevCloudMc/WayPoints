@@ -2,6 +2,7 @@ package org.devcloud.waypoints.storage.sqlite
 
 import java.util.UUID
 import java.util.concurrent.CompletableFuture
+import org.devcloud.waypoints.domain.IconRegistry
 import org.devcloud.waypoints.domain.Waypoint
 import org.devcloud.waypoints.domain.WaypointId
 import org.devcloud.waypoints.storage.WaypointRepository
@@ -83,7 +84,7 @@ class SqliteWaypointRepository(private val pool: ConnectionPool) : WaypointRepos
                     ps.setString(1, wp.id.toString())
                     ps.setString(2, wp.owner?.toString())
                     ps.setString(3, wp.name)
-                    ps.setString(4, wp.icon.name())
+                    ps.setString(4, IconRegistry.serialize(wp.icon))
                     ps.setString(5, wp.location.worldName)
                     ps.setDouble(6, wp.location.x)
                     ps.setDouble(7, wp.location.y)

@@ -8,7 +8,7 @@ import java.util.UUID
 import java.util.concurrent.CompletableFuture
 import java.util.concurrent.Executors
 import org.bukkit.configuration.file.YamlConfiguration
-import org.bukkit.map.MapCursor
+import org.devcloud.waypoints.domain.IconRegistry
 import org.devcloud.waypoints.domain.PlayerProfile
 import org.devcloud.waypoints.domain.VisibilityState
 import org.devcloud.waypoints.domain.Waypoint
@@ -190,7 +190,7 @@ class YamlStorageBackend(private val file: Path) : StorageBackend {
                     id = WaypointId.parse(m["id"] as String),
                     owner = (m["owner"] as String?)?.let(UUID::fromString),
                     name = m["name"] as String,
-                    icon = MapCursor.Type.valueOf(m["icon"] as String),
+                    icon = IconRegistry.parse(m["icon"] as String) ?: IconRegistry.SAFE_DEFAULT,
                     location =
                         WaypointLocation(
                             worldName = m["world"] as String,
@@ -238,7 +238,7 @@ class YamlStorageBackend(private val file: Path) : StorageBackend {
                     "id" to wp.id.toString(),
                     "owner" to wp.owner?.toString(),
                     "name" to wp.name,
-                    "icon" to wp.icon.name(),
+                    "icon" to IconRegistry.serialize(wp.icon),
                     "world" to wp.location.worldName,
                     "x" to wp.location.x,
                     "y" to wp.location.y,

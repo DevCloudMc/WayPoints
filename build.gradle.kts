@@ -1,10 +1,12 @@
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
+import java.net.URI
 
 plugins {
     kotlin("jvm") version "2.0.20"
     id("com.gradleup.shadow") version "8.3.3"
     id("io.gitlab.arturbosch.detekt") version "1.23.7"
     id("com.diffplug.spotless") version "6.25.0"
+    id("org.jetbrains.dokka") version "1.9.20"
     `maven-publish`
 }
 
@@ -54,6 +56,35 @@ tasks.named<ShadowJar>("shadowJar") {
 
 tasks.build { dependsOn(tasks.shadowJar) }
 
+tasks.register<Jar>("sourcesJar") {
+    archiveClassifier.set("sources")
+    from(sourceSets.main.get().allSource)
+}
+
+tasks.register<Jar>("javadocJar") {
+    archiveClassifier.set("javadoc")
+    from(tasks.named("dokkaHtml"))
+    dependsOn(tasks.named("dokkaHtml"))
+}
+
+tasks.named<org.jetbrains.dokka.gradle.DokkaTask>("dokkaHtml") {
+    moduleName.set("WayPoints")
+    dokkaSourceSets.configureEach {
+        includes.from("docs/module.md")
+        jdkVersion.set(21)
+        reportUndocumented.set(false)
+        skipEmptyPackages.set(true)
+        // Document only the intentionally-public surface.
+        perPackageOption {
+            matchingRegex.set(
+                "org\\.devcloud\\.waypoints\\.(service|storage|command|listener|provider|config|messaging|integration|util)(\\..*)?"
+            )
+            suppress.set(true)
+        }
+        externalDocumentationLink { url.set(URI("https://jd.papermc.io/paper/1.21.1/").toURL()) }
+    }
+}
+
 detekt {
     buildUponDefaultConfig = true
     config.setFrom("$projectDir/detekt.yml")
@@ -75,6 +106,8 @@ publishing {
     publications {
         create<MavenPublication>("shadow") {
             artifact(tasks.named("shadowJar")) { classifier = "" }
+            artifact(tasks.named("sourcesJar"))
+            artifact(tasks.named("javadocJar"))
             groupId = project.group.toString()
             artifactId = "waypoints"
             version = project.version.toString()

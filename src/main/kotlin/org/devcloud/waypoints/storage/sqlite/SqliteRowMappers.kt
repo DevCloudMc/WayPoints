@@ -3,7 +3,7 @@ package org.devcloud.waypoints.storage.sqlite
 import java.sql.ResultSet
 import java.time.Instant
 import java.util.UUID
-import org.bukkit.map.MapCursor
+import org.devcloud.waypoints.domain.IconRegistry
 import org.devcloud.waypoints.domain.PlayerProfile
 import org.devcloud.waypoints.domain.VisibilityState
 import org.devcloud.waypoints.domain.Waypoint
@@ -19,7 +19,7 @@ internal object SqliteRowMappers {
             id = WaypointId.parse(rs.getString("id")),
             owner = ownerStr?.let(UUID::fromString),
             name = rs.getString("name"),
-            icon = MapCursor.Type.valueOf(rs.getString("icon")),
+            icon = IconRegistry.parse(rs.getString("icon")) ?: IconRegistry.SAFE_DEFAULT,
             location =
                 WaypointLocation(
                     worldName = rs.getString("world"),
