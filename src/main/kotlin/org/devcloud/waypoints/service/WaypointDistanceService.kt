@@ -16,8 +16,11 @@ object WaypointDistanceService {
 
     fun formatLabel(name: String, distanceBlocks: Double, decimals: Int): String {
         val rounded =
-            if (decimals == 0) distanceBlocks.roundToLong().toString()
-            else "%.${decimals}f".format(distanceBlocks)
+            if (decimals == 0) {
+                distanceBlocks.roundToLong().toString()
+            } else {
+                "%.${decimals}f".format(distanceBlocks)
+            }
         return "$name $rounded m"
     }
 }

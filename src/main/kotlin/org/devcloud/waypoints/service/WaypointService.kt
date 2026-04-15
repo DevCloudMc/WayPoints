@@ -53,11 +53,15 @@ class WaypointService(
     fun findById(id: WaypointId): Waypoint? {
         for (map in personalCache.values) {
             for (wp in map.values) {
-                if (wp.id == id) return wp
+                if (wp.id == id) {
+                    return wp
+                }
             }
         }
         for (wp in globalCache.values) {
-            if (wp.id == id) return wp
+            if (wp.id == id) {
+                return wp
+            }
         }
         return null
     }
@@ -69,11 +73,16 @@ class WaypointService(
         location: WaypointLocation,
         limit: Int,
     ): CompletableFuture<Outcome<Waypoint, WaypointError>> {
-        if (!nameRegex.matches(name)) return done(Outcome.Err(WaypointError.InvalidName(name)))
+        if (!nameRegex.matches(name)) {
+            return done(Outcome.Err(WaypointError.InvalidName(name)))
+        }
         val owned = personalCache.getOrPut(owner) { ConcurrentHashMap() }
-        if (owned.containsKey(name)) return done(Outcome.Err(WaypointError.NameTaken(name)))
-        if (owned.size >= limit)
+        if (owned.containsKey(name)) {
+            return done(Outcome.Err(WaypointError.NameTaken(name)))
+        }
+        if (owned.size >= limit) {
             return done(Outcome.Err(WaypointError.LimitReached(owned.size, limit)))
+        }
         val wp =
             Waypoint(
                 WaypointId.random(),
@@ -95,8 +104,12 @@ class WaypointService(
         icon: MapCursor.Type,
         location: WaypointLocation,
     ): CompletableFuture<Outcome<Waypoint, WaypointError>> {
-        if (!nameRegex.matches(name)) return done(Outcome.Err(WaypointError.InvalidName(name)))
-        if (globalCache.containsKey(name)) return done(Outcome.Err(WaypointError.NameTaken(name)))
+        if (!nameRegex.matches(name)) {
+            return done(Outcome.Err(WaypointError.InvalidName(name)))
+        }
+        if (globalCache.containsKey(name)) {
+            return done(Outcome.Err(WaypointError.NameTaken(name)))
+        }
         val wp =
             Waypoint(
                 WaypointId.random(),
@@ -137,10 +150,14 @@ class WaypointService(
         old: String,
         new: String,
     ): CompletableFuture<Outcome<Waypoint, WaypointError>> {
-        if (!nameRegex.matches(new)) return done(Outcome.Err(WaypointError.InvalidName(new)))
+        if (!nameRegex.matches(new)) {
+            return done(Outcome.Err(WaypointError.InvalidName(new)))
+        }
         val owned = personalCache[owner] ?: return done(Outcome.Err(WaypointError.NotFound(old)))
         val wp = owned[old] ?: return done(Outcome.Err(WaypointError.NotFound(old)))
-        if (owned.containsKey(new)) return done(Outcome.Err(WaypointError.NameTaken(new)))
+        if (owned.containsKey(new)) {
+            return done(Outcome.Err(WaypointError.NameTaken(new)))
+        }
         val renamed = wp.copy(name = new)
         owned.remove(old)
         owned[new] = renamed
@@ -153,9 +170,13 @@ class WaypointService(
         old: String,
         new: String,
     ): CompletableFuture<Outcome<Waypoint, WaypointError>> {
-        if (!nameRegex.matches(new)) return done(Outcome.Err(WaypointError.InvalidName(new)))
+        if (!nameRegex.matches(new)) {
+            return done(Outcome.Err(WaypointError.InvalidName(new)))
+        }
         val wp = globalCache[old] ?: return done(Outcome.Err(WaypointError.NotFound(old)))
-        if (globalCache.containsKey(new)) return done(Outcome.Err(WaypointError.NameTaken(new)))
+        if (globalCache.containsKey(new)) {
+            return done(Outcome.Err(WaypointError.NameTaken(new)))
+        }
         val renamed = wp.copy(name = new)
         globalCache.remove(old)
         globalCache[new] = renamed

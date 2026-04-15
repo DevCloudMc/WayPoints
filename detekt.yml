@@ -16,6 +16,18 @@ style:
     active: true
   LoopWithTooManyJumpStatements:
     active: false
+  BracesOnIfStatements:
+    # Single-line `if (x) return` guards are kept brace-less to stay compatible with ktfmt,
+    # which rewrites braced one-liners back to this form. Multi-line branches must have braces.
+    active: true
+    singleLine: 'necessary'
+    multiLine: 'always'
+  BracesOnWhenStatements:
+    active: true
+    singleLine: 'necessary'
+    multiLine: 'consistent'
+  MandatoryBracesLoops:
+    active: true
 
 performance:
   SpreadOperator:

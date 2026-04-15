@@ -35,7 +35,9 @@ class RenameCommand(private val ctx: WayPointsBootstrap) {
                     )
                     return
                 }
-        if (CommandSupport.callCancellable(WaypointRenameEvent(player, wp, new))) return
+        if (CommandSupport.callCancellable(WaypointRenameEvent(player, wp, new))) {
+            return
+        }
         ctx.waypointService.renamePersonal(player.uniqueId, old, new).thenAccept { res ->
             ctx.async.runOnMain {
                 when (res) {

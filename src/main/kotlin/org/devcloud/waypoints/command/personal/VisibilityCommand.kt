@@ -56,7 +56,12 @@ class VisibilityCommand(private val ctx: WayPointsBootstrap) {
                     ctx.lang.message(
                         "visibility-set",
                         "scope" to scope.name.lowercase(),
-                        "state" to if (hide) "hidden" else "visible",
+                        "state" to
+                            if (hide) {
+                                "hidden"
+                            } else {
+                                "visible"
+                            },
                     ),
                 )
             }

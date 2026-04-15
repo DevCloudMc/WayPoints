@@ -32,7 +32,9 @@ class GlobalRenameCommand(private val ctx: WayPointsBootstrap) {
                     )
                     return
                 }
-        if (CommandSupport.callCancellable(WaypointRenameEvent(sender, wp, new))) return
+        if (CommandSupport.callCancellable(WaypointRenameEvent(sender, wp, new))) {
+            return
+        }
         ctx.waypointService.renameGlobal(old, new).thenAccept { res ->
             ctx.async.runOnMain {
                 when (res) {

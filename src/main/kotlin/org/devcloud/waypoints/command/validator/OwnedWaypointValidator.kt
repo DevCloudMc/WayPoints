@@ -12,7 +12,9 @@ class OwnedWaypointValidator(private val waypointService: WaypointService) :
         input: Array<out String>,
         args: Array<out String>,
     ): Boolean {
-        if (sender !is Player) return false
+        if (sender !is Player) {
+            return false
+        }
         val name = input.firstOrNull() ?: return false
         return waypointService.findOwned(sender.uniqueId, name) != null
     }
@@ -22,7 +24,11 @@ class OwnedWaypointValidator(private val waypointService: WaypointService) :
     override fun getTabCompletes(
         sender: CommandSender,
         args: Array<out String>,
-    ): Collection<String> =
-        if (sender is Player) waypointService.listOwned(sender.uniqueId).map { it.name }
-        else emptyList()
+    ): Collection<String> {
+        return if (sender is Player) {
+            waypointService.listOwned(sender.uniqueId).map { it.name }
+        } else {
+            emptyList()
+        }
+    }
 }

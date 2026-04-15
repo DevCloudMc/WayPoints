@@ -71,7 +71,9 @@ class YamlStorageBackend(private val file: Path) : StorageBackend {
                         shares = cache.shares.filterNot { it.waypointId == id },
                     )
                 val removed = cache.waypoints.size != before
-                if (removed) persist()
+                if (removed) {
+                    persist()
+                }
                 removed
             }
 
@@ -83,7 +85,9 @@ class YamlStorageBackend(private val file: Path) : StorageBackend {
                         waypoints = cache.waypoints - toRemove.toSet(),
                         shares = cache.shares.filterNot { it.waypointId in removedIds },
                     )
-                if (toRemove.isNotEmpty()) persist()
+                if (toRemove.isNotEmpty()) {
+                    persist()
+                }
                 toRemove.size
             }
         }
@@ -114,7 +118,9 @@ class YamlStorageBackend(private val file: Path) : StorageBackend {
                             }
                     )
                 val removed = cache.shares.size != before
-                if (removed) persist()
+                if (removed) {
+                    persist()
+                }
                 removed
             }
 
@@ -130,7 +136,9 @@ class YamlStorageBackend(private val file: Path) : StorageBackend {
                 val ownedIds = cache.waypoints.filter { it.owner == owner }.map { it.id }.toSet()
                 val toRemove = cache.shares.filter { it.waypointId in ownedIds }
                 cache = cache.copy(shares = cache.shares - toRemove.toSet())
-                if (toRemove.isNotEmpty()) persist()
+                if (toRemove.isNotEmpty()) {
+                    persist()
+                }
                 toRemove.size
             }
         }
@@ -153,7 +161,11 @@ class YamlStorageBackend(private val file: Path) : StorageBackend {
 
     override fun init(): CompletableFuture<Unit> = submit {
         Files.createDirectories(file.toAbsolutePath().parent)
-        if (Files.exists(file)) cache = load() else persist()
+        if (Files.exists(file)) {
+            cache = load()
+        } else {
+            persist()
+        }
         Unit
     }
 

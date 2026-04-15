@@ -40,8 +40,9 @@ class UnshareCommand(private val ctx: WayPointsBootstrap) {
                     )
                     return
                 }
-        if (CommandSupport.callCancellable(WaypointUnshareEvent(player, wp, target.uniqueId)))
+        if (CommandSupport.callCancellable(WaypointUnshareEvent(player, wp, target.uniqueId))) {
             return
+        }
         ctx.shareService.unshare(wp.id, target.uniqueId).thenAccept { removed ->
             ctx.async.runOnMain {
                 if (removed) {

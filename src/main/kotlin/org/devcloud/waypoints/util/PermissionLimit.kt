@@ -11,12 +11,18 @@ object PermissionLimit {
         val needle = "$prefix."
         var max = 0
         for (info in permissible.effectivePermissions) {
-            if (!info.value) continue
+            if (!info.value) {
+                continue
+            }
             val node = info.permission
-            if (!node.startsWith(needle)) continue
+            if (!node.startsWith(needle)) {
+                continue
+            }
             val tail = node.substring(needle.length)
             val n = tail.toIntOrNull() ?: continue
-            if (n > max) max = n
+            if (n > max) {
+                max = n
+            }
         }
         return max
     }

@@ -58,7 +58,9 @@ class TeleportCommand(private val ctx: WayPointsBootstrap) {
                     )
                     return
                 }
-        if (CommandSupport.callCancellable(WaypointTeleportEvent(player, wp))) return
+        if (CommandSupport.callCancellable(WaypointTeleportEvent(player, wp))) {
+            return
+        }
         ctx.teleportService.markUsed(player.uniqueId)
         ctx.messenger.send(player, ctx.lang.message("teleport-ok", "name" to wp.name))
         player.teleport(resolved)

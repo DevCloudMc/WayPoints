@@ -13,7 +13,11 @@ class SqliteWaypointRepository(private val pool: ConnectionPool) : WaypointRepos
             c.prepareStatement("SELECT * FROM waypoints WHERE id = ?").use { ps ->
                 ps.setString(1, id.toString())
                 ps.executeQuery().use { rs ->
-                    if (rs.next()) SqliteRowMappers.waypoint(rs) else null
+                    if (rs.next()) {
+                        SqliteRowMappers.waypoint(rs)
+                    } else {
+                        null
+                    }
                 }
             }
         }
@@ -27,7 +31,11 @@ class SqliteWaypointRepository(private val pool: ConnectionPool) : WaypointRepos
                     ps.setString(1, owner.toString())
                     ps.setString(2, name)
                     ps.executeQuery().use { rs ->
-                        if (rs.next()) SqliteRowMappers.waypoint(rs) else null
+                        if (rs.next()) {
+                            SqliteRowMappers.waypoint(rs)
+                        } else {
+                            null
+                        }
                     }
                 }
         }
@@ -38,7 +46,11 @@ class SqliteWaypointRepository(private val pool: ConnectionPool) : WaypointRepos
                 ps ->
                 ps.setString(1, name)
                 ps.executeQuery().use { rs ->
-                    if (rs.next()) SqliteRowMappers.waypoint(rs) else null
+                    if (rs.next()) {
+                        SqliteRowMappers.waypoint(rs)
+                    } else {
+                        null
+                    }
                 }
             }
         }
@@ -49,7 +61,9 @@ class SqliteWaypointRepository(private val pool: ConnectionPool) : WaypointRepos
                 ps.setString(1, owner.toString())
                 ps.executeQuery().use { rs ->
                     val out = mutableListOf<Waypoint>()
-                    while (rs.next()) out += SqliteRowMappers.waypoint(rs)
+                    while (rs.next()) {
+                        out += SqliteRowMappers.waypoint(rs)
+                    }
                     out
                 }
             }
@@ -60,7 +74,9 @@ class SqliteWaypointRepository(private val pool: ConnectionPool) : WaypointRepos
             c.prepareStatement("SELECT * FROM waypoints WHERE scope = 'GLOBAL'").use { ps ->
                 ps.executeQuery().use { rs ->
                     val out = mutableListOf<Waypoint>()
-                    while (rs.next()) out += SqliteRowMappers.waypoint(rs)
+                    while (rs.next()) {
+                        out += SqliteRowMappers.waypoint(rs)
+                    }
                     out
                 }
             }

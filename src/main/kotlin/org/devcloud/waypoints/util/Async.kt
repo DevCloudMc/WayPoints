@@ -7,7 +7,11 @@ import org.bukkit.plugin.Plugin
 
 class Async(private val plugin: Plugin) {
     val mainExecutor: Executor = Executor { task ->
-        if (Bukkit.isPrimaryThread()) task.run() else Bukkit.getScheduler().runTask(plugin, task)
+        if (Bukkit.isPrimaryThread()) {
+            task.run()
+        } else {
+            Bukkit.getScheduler().runTask(plugin, task)
+        }
     }
 
     val asyncExecutor: Executor = Executor { task ->

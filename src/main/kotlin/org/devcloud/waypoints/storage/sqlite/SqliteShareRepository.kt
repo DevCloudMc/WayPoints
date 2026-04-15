@@ -23,8 +23,11 @@ class SqliteShareRepository(private val pool: ConnectionPool) : ShareRepository 
                 true
             } catch (e: SQLException) {
                 val msg = e.message ?: throw e
-                if (msg.contains("UNIQUE", true) || msg.contains("PRIMARY KEY", true)) false
-                else throw e
+                if (msg.contains("UNIQUE", true) || msg.contains("PRIMARY KEY", true)) {
+                    false
+                } else {
+                    throw e
+                }
             }
         }
 
@@ -46,7 +49,9 @@ class SqliteShareRepository(private val pool: ConnectionPool) : ShareRepository 
                 ps.setString(1, target.toString())
                 ps.executeQuery().use { rs ->
                     val out = mutableListOf<WaypointShare>()
-                    while (rs.next()) out += SqliteRowMappers.share(rs)
+                    while (rs.next()) {
+                        out += SqliteRowMappers.share(rs)
+                    }
                     out
                 }
             }
@@ -58,7 +63,9 @@ class SqliteShareRepository(private val pool: ConnectionPool) : ShareRepository 
                 ps.setString(1, id.toString())
                 ps.executeQuery().use { rs ->
                     val out = mutableListOf<WaypointShare>()
-                    while (rs.next()) out += SqliteRowMappers.share(rs)
+                    while (rs.next()) {
+                        out += SqliteRowMappers.share(rs)
+                    }
                     out
                 }
             }

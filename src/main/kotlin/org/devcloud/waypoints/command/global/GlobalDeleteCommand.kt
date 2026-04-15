@@ -27,7 +27,9 @@ class GlobalDeleteCommand(private val ctx: WayPointsBootstrap) {
                     )
                     return
                 }
-        if (CommandSupport.callCancellable(WaypointDeleteEvent(sender, wp))) return
+        if (CommandSupport.callCancellable(WaypointDeleteEvent(sender, wp))) {
+            return
+        }
         ctx.waypointService.deleteGlobal(name).thenAccept { res ->
             ctx.async.runOnMain {
                 when (res) {

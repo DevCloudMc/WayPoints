@@ -26,7 +26,9 @@ class DeleteCommand(private val ctx: WayPointsBootstrap) {
             ctx.messenger.send(player, ctx.lang.message("waypoint-not-found", "name" to name))
             return
         }
-        if (CommandSupport.callCancellable(WaypointDeleteEvent(player, wp))) return
+        if (CommandSupport.callCancellable(WaypointDeleteEvent(player, wp))) {
+            return
+        }
         ctx.waypointService.deletePersonal(player.uniqueId, name).thenAccept { res ->
             ctx.async.runOnMain {
                 when (res) {

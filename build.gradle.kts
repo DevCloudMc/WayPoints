@@ -88,7 +88,7 @@ tasks.named<org.jetbrains.dokka.gradle.DokkaTask>("dokkaHtml") {
 detekt {
     buildUponDefaultConfig = true
     config.setFrom("$projectDir/detekt.yml")
-    autoCorrect = false
+    autoCorrect = true
 }
 
 spotless {

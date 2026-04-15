@@ -44,9 +44,30 @@ class SqlitePlayerRepository(private val pool: ConnectionPool) : PlayerRepositor
                 )
                 .use { ps ->
                     ps.setString(1, profile.uuid.toString())
-                    ps.setInt(2, if (profile.visibility.hidePersonal) 1 else 0)
-                    ps.setInt(3, if (profile.visibility.hideGlobal) 1 else 0)
-                    ps.setInt(4, if (profile.visibility.hideShared) 1 else 0)
+                    ps.setInt(
+                        2,
+                        if (profile.visibility.hidePersonal) {
+                            1
+                        } else {
+                            0
+                        },
+                    )
+                    ps.setInt(
+                        3,
+                        if (profile.visibility.hideGlobal) {
+                            1
+                        } else {
+                            0
+                        },
+                    )
+                    ps.setInt(
+                        4,
+                        if (profile.visibility.hideShared) {
+                            1
+                        } else {
+                            0
+                        },
+                    )
                     ps.executeUpdate()
                     Unit
                 }

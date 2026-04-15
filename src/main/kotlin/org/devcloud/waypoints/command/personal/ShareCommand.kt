@@ -40,7 +40,9 @@ class ShareCommand(private val ctx: WayPointsBootstrap) {
                     )
                     return
                 }
-        if (CommandSupport.callCancellable(WaypointShareEvent(player, wp, target.uniqueId))) return
+        if (CommandSupport.callCancellable(WaypointShareEvent(player, wp, target.uniqueId))) {
+            return
+        }
         ctx.shareService.share(wp.id, target.uniqueId).thenAccept { added ->
             ctx.async.runOnMain {
                 if (added) {

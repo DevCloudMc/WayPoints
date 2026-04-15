@@ -18,12 +18,16 @@ sealed class Outcome<out T, out E> {
         }
 
     inline fun onOk(block: (T) -> Unit): Outcome<T, E> {
-        if (this is Ok) block(value)
+        if (this is Ok) {
+            block(value)
+        }
         return this
     }
 
     inline fun onErr(block: (E) -> Unit): Outcome<T, E> {
-        if (this is Err) block(error)
+        if (this is Err) {
+            block(error)
+        }
         return this
     }
 }
