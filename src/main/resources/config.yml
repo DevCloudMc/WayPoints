@@ -1,0 +1,31 @@
+# WayPoints configuration
+
+storage:
+  # sqlite | yaml
+  type: sqlite
+
+  sqlite:
+    file: database.db
+
+  yaml:
+    file: waypoints.yml
+
+display:
+  # Hide the label when the player is closer than this many blocks.
+  hide-label-within-blocks: 5
+  # Round coordinates in the label to this many decimals.
+  label-distance-decimals: 0
+
+teleport:
+  enabled: true
+  cooldown-seconds: 10
+  warmup-seconds: 0
+  cancel-on-move: true
+
+defaults:
+  # Cursor type used when the player has no `waypoints.icon.extended` permission.
+  icon: PLAYER_OFF_MAP
+
+advanced:
+  # Report anonymous server metrics to bStats.
+  metrics: true
