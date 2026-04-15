@@ -5,6 +5,7 @@ plugins {
     id("com.gradleup.shadow") version "8.3.3"
     id("io.gitlab.arturbosch.detekt") version "1.23.7"
     id("com.diffplug.spotless") version "6.25.0"
+    `maven-publish`
 }
 
 group = "org.devcloud"
@@ -72,5 +73,39 @@ spotless {
     kotlinGradle {
         ktfmt("0.52").kotlinlangStyle()
         target("*.gradle.kts")
+    }
+}
+
+publishing {
+    publications {
+        create<MavenPublication>("shadow") {
+            artifact(tasks.named("shadowJar")) {
+                classifier = ""
+            }
+            groupId = project.group.toString()
+            artifactId = "waypoints"
+            version = project.version.toString()
+            pom {
+                name.set("WayPoints")
+                description.set("Waypoint addon for Cartographer2")
+                url.set("https://github.com/DevCloudMc/WayPoints")
+                licenses {
+                    license {
+                        name.set("MIT")
+                        url.set("https://opensource.org/licenses/MIT")
+                    }
+                }
+            }
+        }
+    }
+    repositories {
+        maven {
+            name = "GitHubPackages"
+            url = uri("https://maven.pkg.github.com/DevCloudMc/WayPoints")
+            credentials {
+                username = System.getenv("GITHUB_ACTOR") ?: providers.gradleProperty("gpr.user").orNull
+                password = System.getenv("GITHUB_TOKEN") ?: providers.gradleProperty("gpr.key").orNull
+            }
+        }
     }
 }
