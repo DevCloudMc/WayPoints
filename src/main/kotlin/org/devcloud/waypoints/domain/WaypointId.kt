@@ -13,7 +13,7 @@ import java.util.UUID
  * waypoint across time.
  *
  * @property value underlying [UUID].
- * @since 2.0.0
+ * @since 3.0.0
  */
 @JvmInline
 value class WaypointId(val value: UUID) {
@@ -24,7 +24,7 @@ value class WaypointId(val value: UUID) {
          * Creates a new [WaypointId] backed by a [UUID.randomUUID]. Used by the service layer when
          * a player creates a new waypoint.
          *
-         * @since 2.0.0
+         * @since 3.0.0
          */
         fun random(): WaypointId = WaypointId(UUID.randomUUID())
 
@@ -34,7 +34,7 @@ value class WaypointId(val value: UUID) {
          * @param s a UUID in the standard `xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx` form.
          * @return the parsed id.
          * @throws IllegalArgumentException if [s] is not a valid UUID string.
-         * @since 2.0.0
+         * @since 3.0.0
          */
         fun parse(s: String): WaypointId = WaypointId(UUID.fromString(s))
     }

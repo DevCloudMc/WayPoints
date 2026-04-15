@@ -3,6 +3,6 @@
   "main": "org.devcloud.waypoints.WayPointsModule",
   "description": "Personal and global waypoints for Cartographer2 minimaps.",
   "author": "DevCloud",
-  "version": "2.0.0",
+  "version": "3.0.0",
   "website": "https://github.com/DevCloudMc/WayPoints"
 }

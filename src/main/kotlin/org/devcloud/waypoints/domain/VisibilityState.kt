@@ -11,7 +11,7 @@ package org.devcloud.waypoints.domain
  * @property hidePersonal hide the player's own personal waypoints.
  * @property hideGlobal hide every global waypoint.
  * @property hideShared hide waypoints other players shared with them.
- * @since 2.0.0
+ * @since 3.0.0
  */
 data class VisibilityState(
     val hidePersonal: Boolean = false,

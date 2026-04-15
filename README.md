@@ -182,7 +182,7 @@ Add the dependency (artifact will be published to the project's Maven repository
 
 ```kotlin
 dependencies {
-    compileOnly("org.devcloud:waypoints:2.0.0")
+    compileOnly("org.devcloud:waypoints:3.0.0")
 }
 ```
 

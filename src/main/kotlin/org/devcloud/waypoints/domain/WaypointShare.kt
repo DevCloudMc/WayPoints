@@ -17,6 +17,6 @@ import java.util.UUID
  * @property sharedWith UUID of the receiving player.
  * @property sharedAt wall-clock time the share was granted.
  * @see org.devcloud.waypoints.api.event.WaypointShareEvent
- * @since 2.0.0
+ * @since 3.0.0
  */
 data class WaypointShare(val waypointId: WaypointId, val sharedWith: UUID, val sharedAt: Instant)

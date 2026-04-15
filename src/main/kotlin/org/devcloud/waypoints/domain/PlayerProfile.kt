@@ -11,7 +11,7 @@ import java.util.UUID
  *
  * @property uuid UUID of the owning player.
  * @property visibility which waypoint scopes this player wants to see.
- * @since 2.0.0
+ * @since 3.0.0
  */
 data class PlayerProfile(
     val uuid: UUID,

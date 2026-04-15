@@ -27,7 +27,7 @@ import org.devcloud.waypoints.domain.Waypoint
  * @property target UUID of the player the waypoint is being shared with.
  * @see WaypointEvent
  * @see WaypointUnshareEvent
- * @since 2.0.0
+ * @since 3.0.0
  */
 class WaypointShareEvent(sender: CommandSender, waypoint: Waypoint, val target: UUID) :
     WaypointEvent(sender, waypoint) {

@@ -39,7 +39,7 @@ import org.devcloud.waypoints.domain.Waypoint
  *   another plugin.
  * @property waypoint the waypoint the event is about. Treat it as immutable — mutating it after an
  *   event fires does not update the cache.
- * @since 2.0.0
+ * @since 3.0.0
  */
 abstract class WaypointEvent(val sender: CommandSender, val waypoint: Waypoint) :
     Event(), Cancellable {

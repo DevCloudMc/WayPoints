@@ -29,7 +29,7 @@ import org.bukkit.Location
  * @property z world Z coordinate.
  * @property yaw facing yaw (0°–360°, unchecked).
  * @property pitch facing pitch (-90°–90°, unchecked).
- * @since 2.0.0
+ * @since 3.0.0
  */
 data class WaypointLocation(
     val worldName: String,
@@ -44,7 +44,7 @@ data class WaypointLocation(
      *
      * @return a fresh [Location] pointing at the stored coordinates in the current
      *   [org.bukkit.World] instance of [worldName], or `null` when that world is not loaded.
-     * @since 2.0.0
+     * @since 3.0.0
      */
     fun resolve(): Location? {
         val world = Bukkit.getWorld(worldName) ?: return null
@@ -58,7 +58,7 @@ data class WaypointLocation(
          * @param loc a non-null Bukkit location with a non-null [Location.world].
          * @return a fresh [WaypointLocation] mirroring [loc].
          * @throws IllegalArgumentException if [Location.world] is `null`.
-         * @since 2.0.0
+         * @since 3.0.0
          */
         fun of(loc: Location): WaypointLocation =
             WaypointLocation(

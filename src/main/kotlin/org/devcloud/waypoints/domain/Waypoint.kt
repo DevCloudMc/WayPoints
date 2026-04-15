@@ -45,7 +45,7 @@ import org.bukkit.map.MapCursor
  * @see WaypointScope
  * @see WaypointLocation
  * @see org.devcloud.waypoints.api.WaypointsApi
- * @since 2.0.0
+ * @since 3.0.0
  */
 data class Waypoint(
     val id: WaypointId,

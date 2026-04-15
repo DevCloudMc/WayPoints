@@ -24,7 +24,7 @@ import org.devcloud.waypoints.domain.Waypoint
  * Fires for both personal (`/wp create`) and global (`/wp global create`) waypoints.
  *
  * @see WaypointEvent
- * @since 2.0.0
+ * @since 3.0.0
  */
 class WaypointCreateEvent(sender: CommandSender, waypoint: Waypoint) :
     WaypointEvent(sender, waypoint) {

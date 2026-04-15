@@ -30,7 +30,7 @@ import org.devcloud.waypoints.domain.Waypoint
  * ```
  *
  * @see WaypointEvent
- * @since 2.0.0
+ * @since 3.0.0
  */
 class WaypointTeleportEvent(sender: CommandSender, waypoint: Waypoint) :
     WaypointEvent(sender, waypoint) {

@@ -15,7 +15,7 @@ import org.devcloud.waypoints.domain.Waypoint
  *
  * @property newName the rename target. Never blank, always matches the name regex.
  * @see WaypointEvent
- * @since 2.0.0
+ * @since 3.0.0
  */
 class WaypointRenameEvent(sender: CommandSender, waypoint: Waypoint, val newName: String) :
     WaypointEvent(sender, waypoint) {

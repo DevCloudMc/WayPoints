@@ -12,7 +12,7 @@ import org.devcloud.waypoints.domain.Waypoint
  * per wiped waypoint).
  *
  * @see WaypointEvent
- * @since 2.0.0
+ * @since 3.0.0
  */
 class WaypointDeleteEvent(sender: CommandSender, waypoint: Waypoint) :
     WaypointEvent(sender, waypoint) {

@@ -3,7 +3,7 @@ package org.devcloud.waypoints.domain
 /**
  * Visibility class of a [Waypoint].
  *
- * @since 2.0.0
+ * @since 3.0.0
  */
 enum class WaypointScope {
     /** Owned by a single player and only shown to the owner (or players they have shared with). */

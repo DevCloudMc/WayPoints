@@ -47,7 +47,7 @@ import org.devcloud.waypoints.domain.Waypoint
  *
  * @see org.devcloud.waypoints.api.event.WaypointEvent
  * @see org.devcloud.waypoints.domain.Waypoint
- * @since 2.0.0
+ * @since 3.0.0
  */
 interface WaypointsApi {
     /**
@@ -60,7 +60,7 @@ interface WaypointsApi {
      *
      * @param owner UUID of the waypoint owner (usually a player).
      * @return an immutable snapshot; safe to iterate concurrently with further writes.
-     * @since 2.0.0
+     * @since 3.0.0
      */
     fun listOwned(owner: UUID): List<Waypoint>
 
@@ -71,7 +71,7 @@ interface WaypointsApi {
      * This method is **O(n)** and does not hit storage.
      *
      * @return an immutable snapshot.
-     * @since 2.0.0
+     * @since 3.0.0
      */
     fun listGlobal(): List<Waypoint>
 
@@ -83,7 +83,7 @@ interface WaypointsApi {
      * @param name the literal name the player used when creating the waypoint.
      * @return the matching waypoint, or `null` if missing.
      * @see Waypoint.name
-     * @since 2.0.0
+     * @since 3.0.0
      */
     fun findOwned(owner: UUID, name: String): Waypoint?
 
@@ -93,7 +93,7 @@ interface WaypointsApi {
      *
      * @param name the literal name a staff member gave the global waypoint.
      * @return the matching waypoint, or `null` if missing.
-     * @since 2.0.0
+     * @since 3.0.0
      */
     fun findGlobal(name: String): Waypoint?
 
@@ -117,7 +117,7 @@ interface WaypointsApi {
      *
      * @param player UUID of the viewing player. Offline players see only global waypoints.
      * @return an immutable snapshot ordered personal → global → shared.
-     * @since 2.0.0
+     * @since 3.0.0
      */
     fun listAccessible(player: UUID): List<Waypoint>
 }

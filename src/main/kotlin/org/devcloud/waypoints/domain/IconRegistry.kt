@@ -25,7 +25,7 @@ import org.bukkit.map.MapCursor
  *     }
  * ```
  *
- * @since 2.0.0
+ * @since 3.0.0
  */
 object IconRegistry {
     /**
@@ -33,7 +33,7 @@ object IconRegistry {
      * `waypoints.icon.extended` permission. Resolved via [Registry.MAP_DECORATION_TYPE] so it works
      * identically on every Minecraft version that keeps `minecraft:player_off_map`.
      *
-     * @since 2.0.0
+     * @since 3.0.0
      */
     val SAFE_DEFAULT: MapCursor.Type =
         requireNotNull(Registry.MAP_DECORATION_TYPE[NamespacedKey.minecraft("player_off_map")]) {
@@ -52,7 +52,7 @@ object IconRegistry {
      *
      * @param input the name to parse.
      * @return the matching [MapCursor.Type], or `null` if no such cursor exists on this server.
-     * @since 2.0.0
+     * @since 3.0.0
      */
     fun parse(input: String): MapCursor.Type? {
         val trimmed = input.lowercase().removePrefix("minecraft:")
@@ -65,7 +65,7 @@ object IconRegistry {
      *
      * @param type the cursor type to serialise.
      * @return the serialised name; round-trips through [parse].
-     * @since 2.0.0
+     * @since 3.0.0
      */
     fun serialize(type: MapCursor.Type): String = type.key.key
 
@@ -74,7 +74,7 @@ object IconRegistry {
      * and help text.
      *
      * @return an immutable, sorted list of icon names.
-     * @since 2.0.0
+     * @since 3.0.0
      */
     fun allNames(): List<String> = byKey.keys.sorted()
 }

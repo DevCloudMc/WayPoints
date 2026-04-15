@@ -13,7 +13,7 @@ import org.devcloud.waypoints.domain.Waypoint
  * @property target UUID of the player losing access to the waypoint.
  * @see WaypointEvent
  * @see WaypointShareEvent
- * @since 2.0.0
+ * @since 3.0.0
  */
 class WaypointUnshareEvent(sender: CommandSender, waypoint: Waypoint, val target: UUID) :
     WaypointEvent(sender, waypoint) {
