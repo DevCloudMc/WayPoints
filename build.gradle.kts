@@ -38,6 +38,7 @@ dependencies {
     testImplementation(kotlin("test"))
     testImplementation("org.junit.jupiter:junit-jupiter:5.11.0")
     testImplementation("io.mockk:mockk:1.13.12")
+    testImplementation("com.github.seeseemelk:MockBukkit-v1.21:3.133.2")
     testImplementation("io.papermc.paper:paper-api:1.21.1-R0.1-SNAPSHOT")
     testImplementation("io.github.bananapuncher714:cartographer2_api:2.15.11")
 }
