@@ -1,7 +1,7 @@
 package org.devcloud.waypoints.api
 
-import org.devcloud.waypoints.domain.Waypoint
 import java.util.UUID
+import org.devcloud.waypoints.domain.Waypoint
 
 interface WaypointsApi {
     fun listOwned(owner: UUID): List<Waypoint>

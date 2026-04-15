@@ -23,10 +23,15 @@ class GlobalRenameCommand(private val ctx: WayPointsBootstrap) {
     private fun execute(sender: CommandSender, args: Array<out String>, p: CommandParameters) {
         val new = p.getLast(String::class.java)
         val old = p.get(String::class.java, p.size() - 2)
-        val wp = ctx.waypointService.findGlobal(old) ?: run {
-            ctx.messenger.send(sender, ctx.lang.message("waypoint-not-found", "name" to old))
-            return
-        }
+        val wp =
+            ctx.waypointService.findGlobal(old)
+                ?: run {
+                    ctx.messenger.send(
+                        sender,
+                        ctx.lang.message("waypoint-not-found", "name" to old),
+                    )
+                    return
+                }
         if (CommandSupport.callCancellable(WaypointRenameEvent(sender, wp, new))) return
         ctx.waypointService.renameGlobal(old, new).thenAccept { res ->
             ctx.async.runOnMain {

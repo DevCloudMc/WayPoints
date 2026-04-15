@@ -9,15 +9,12 @@ plugins {
 }
 
 group = "org.devcloud"
+
 version = "2.0.0"
 
-java {
-    toolchain.languageVersion.set(JavaLanguageVersion.of(21))
-}
+java { toolchain.languageVersion.set(JavaLanguageVersion.of(21)) }
 
-kotlin {
-    jvmToolchain(21)
-}
+kotlin { jvmToolchain(21) }
 
 repositories {
     mavenLocal()
@@ -46,9 +43,7 @@ dependencies {
 
 tasks.test {
     useJUnitPlatform()
-    testLogging {
-        events("passed", "failed", "skipped")
-    }
+    testLogging { events("passed", "failed", "skipped") }
 }
 
 tasks.named<ShadowJar>("shadowJar") {
@@ -79,9 +74,7 @@ spotless {
 publishing {
     publications {
         create<MavenPublication>("shadow") {
-            artifact(tasks.named("shadowJar")) {
-                classifier = ""
-            }
+            artifact(tasks.named("shadowJar")) { classifier = "" }
             groupId = project.group.toString()
             artifactId = "waypoints"
             version = project.version.toString()
@@ -103,8 +96,10 @@ publishing {
             name = "GitHubPackages"
             url = uri("https://maven.pkg.github.com/DevCloudMc/WayPoints")
             credentials {
-                username = System.getenv("GITHUB_ACTOR") ?: providers.gradleProperty("gpr.user").orNull
-                password = System.getenv("GITHUB_TOKEN") ?: providers.gradleProperty("gpr.key").orNull
+                username =
+                    System.getenv("GITHUB_ACTOR") ?: providers.gradleProperty("gpr.user").orNull
+                password =
+                    System.getenv("GITHUB_TOKEN") ?: providers.gradleProperty("gpr.key").orNull
             }
         }
     }

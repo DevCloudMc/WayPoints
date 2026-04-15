@@ -20,13 +20,22 @@ class WaypointWorldCursorProvider(
     private val hideLabelWithinBlocks: Double,
     private val labelDecimals: Int,
 ) : WorldCursorProvider {
-    override fun getCursors(player: Player, map: Minimap, setting: PlayerSetting): Collection<WorldCursor> {
+    override fun getCursors(
+        player: Player,
+        map: Minimap,
+        setting: PlayerSetting,
+    ): Collection<WorldCursor> {
         val visibility = visibilityService.get(player.uniqueId)
         val out = ArrayList<WorldCursor>(8)
         val playerLoc = player.location
 
         if (!visibility.hidePersonal) {
-            for (wp in waypointService.listOwned(player.uniqueId)) addCursor(out, wp, playerLoc, visibility)
+            for (wp in waypointService.listOwned(player.uniqueId)) addCursor(
+                out,
+                wp,
+                playerLoc,
+                visibility,
+            )
         }
         if (!visibility.hideGlobal) {
             for (wp in waypointService.listGlobals()) addCursor(out, wp, playerLoc, visibility)

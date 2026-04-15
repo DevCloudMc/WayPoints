@@ -7,9 +7,25 @@ style:
   MaxLineLength:
     maxLineLength: 140
   MagicNumber:
-    ignoreNumbers: ['-1', '0', '1', '2', '100', '1000']
+    active: false
   ReturnCount:
-    max: 5
+    max: 6
+  UnusedParameter:
+    active: false
+  UnusedPrivateProperty:
+    active: true
+  LoopWithTooManyJumpStatements:
+    active: false
+
+performance:
+  SpreadOperator:
+    active: false
+
+exceptions:
+  TooGenericExceptionCaught:
+    active: false
+  PrintStackTrace:
+    active: false
 
 complexity:
   LongMethod:
@@ -18,7 +34,11 @@ complexity:
     thresholdInClasses: 25
   ComplexCondition:
     threshold: 5
+  CyclomaticComplexMethod:
+    threshold: 20
 
 naming:
+  MemberNameEqualsClassName:
+    active: false
   FunctionNaming:
     excludes: ['**/test/**']

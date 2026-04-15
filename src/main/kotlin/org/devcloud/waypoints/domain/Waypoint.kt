@@ -1,8 +1,8 @@
 package org.devcloud.waypoints.domain
 
-import org.bukkit.map.MapCursor
 import java.time.Instant
 import java.util.UUID
+import org.bukkit.map.MapCursor
 
 data class Waypoint(
     val id: WaypointId,

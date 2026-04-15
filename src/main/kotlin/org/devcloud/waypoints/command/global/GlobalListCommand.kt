@@ -18,7 +18,10 @@ class GlobalListCommand(private val ctx: WayPointsBootstrap) {
             ctx.messenger.send(sender, ctx.lang.message("global-list-empty"))
             return
         }
-        ctx.messenger.send(sender, ctx.lang.message("global-list-header", "count" to wps.size.toString()))
+        ctx.messenger.send(
+            sender,
+            ctx.lang.message("global-list-header", "count" to wps.size.toString()),
+        )
         for (wp in wps) {
             ctx.messenger.send(
                 sender,

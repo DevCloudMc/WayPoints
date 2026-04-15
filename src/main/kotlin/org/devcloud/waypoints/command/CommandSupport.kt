@@ -11,10 +11,15 @@ internal object CommandSupport {
         when (err) {
             is WaypointError.InvalidName -> ctx.lang.message("invalid-name")
             is WaypointError.NameTaken -> ctx.lang.message("name-taken", "name" to err.name)
-            is WaypointError.LimitReached -> ctx.lang.message("limit-reached", "max" to err.max.toString())
+            is WaypointError.LimitReached ->
+                ctx.lang.message("limit-reached", "max" to err.max.toString())
             is WaypointError.NotFound -> ctx.lang.message("waypoint-not-found", "name" to err.name)
             is WaypointError.InvalidIcon ->
-                ctx.lang.message("invalid-icon", "icon" to err.icon, "hint" to err.allowed.take(8).joinToString(", "))
+                ctx.lang.message(
+                    "invalid-icon",
+                    "icon" to err.icon,
+                    "hint" to err.allowed.take(8).joinToString(", "),
+                )
             is WaypointError.WorldMissing ->
                 ctx.lang.message("world-missing", "world" to err.worldName, "name" to "")
             WaypointError.NotOwner,

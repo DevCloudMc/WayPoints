@@ -29,22 +29,31 @@ import org.devcloud.waypoints.util.Async
 class WayPointsBootstrap(val module: Module) {
     lateinit var config: ConfigSchema
         private set
+
     lateinit var lang: LangSchema
         private set
+
     lateinit var messenger: Messenger
         private set
+
     lateinit var storage: StorageBackend
         private set
+
     lateinit var waypointService: WaypointService
         private set
+
     lateinit var shareService: ShareService
         private set
+
     lateinit var visibilityService: VisibilityService
         private set
+
     lateinit var teleportService: TeleportService
         private set
+
     lateinit var provider: WaypointWorldCursorProvider
         private set
+
     lateinit var async: Async
         private set
 
@@ -73,12 +82,19 @@ class WayPointsBootstrap(val module: Module) {
             )
 
         module.registerListener(
-            PlayerLifecycleListener(waypointService, shareService, visibilityService, teleportService)
+            PlayerLifecycleListener(
+                waypointService,
+                shareService,
+                visibilityService,
+                teleportService,
+            )
         )
         module.registerListener(MinimapLifecycleListener(provider))
 
         // Already-loaded minimaps won't fire MinimapLoadEvent again — register on them now.
-        Cartographer.getInstance().mapManager.minimaps.values.forEach { it.registerProvider(provider) }
+        Cartographer.getInstance().mapManager.minimaps.values.forEach {
+            it.registerProvider(provider)
+        }
 
         // Warm profiles + personals for players that are already online (e.g. after /reload).
         for (player in Bukkit.getOnlinePlayers()) {
@@ -89,7 +105,8 @@ class WayPointsBootstrap(val module: Module) {
         }
 
         val api: WaypointsApi = WaypointsApiImpl(waypointService, shareService)
-        Bukkit.getServicesManager().register(WaypointsApi::class.java, api, hostPlugin, ServicePriority.Normal)
+        Bukkit.getServicesManager()
+            .register(WaypointsApi::class.java, api, hostPlugin, ServicePriority.Normal)
 
         val tree = CommandTreeBuilder(this).build()
         module.registerCommandViaReflection(tree)
@@ -108,7 +125,8 @@ class WayPointsBootstrap(val module: Module) {
     fun reload() {
         loadConfigs()
         // Live-updating provider constants requires replacing the provider; caches remain valid.
-        // For 2.0 we only reload lang + config values that are read on each call (teleport cooldown from TeleportService
+        // For 2.0 we only reload lang + config values that are read on each call (teleport cooldown
+        // from TeleportService
         // is captured at construction, so a full reload requires a restart). Document this in help.
     }
 
@@ -116,11 +134,15 @@ class WayPointsBootstrap(val module: Module) {
         val loader = YamlConfigLoader(module.dataFolder)
         val cfgYaml =
             loader.loadOrCopyDefault("config.yml") {
-                requireNotNull(javaClass.getResourceAsStream("/config.yml")) { "config.yml missing from JAR" }
+                requireNotNull(javaClass.getResourceAsStream("/config.yml")) {
+                    "config.yml missing from JAR"
+                }
             }
         val langYaml =
             loader.loadOrCopyDefault("lang.yml") {
-                requireNotNull(javaClass.getResourceAsStream("/lang.yml")) { "lang.yml missing from JAR" }
+                requireNotNull(javaClass.getResourceAsStream("/lang.yml")) {
+                    "lang.yml missing from JAR"
+                }
             }
         config = ConfigSchema.load(cfgYaml)
         lang = LangSchema.of(langYaml)
@@ -141,11 +163,16 @@ class WayPointsBootstrap(val module: Module) {
 }
 
 /**
- * Module#registerCommand takes a PluginCommand. CommandBase.build() returns PluginCommand via reflection/protected
- * wiring in Cartographer2. This helper isolates that integration point.
+ * Module#registerCommand takes a PluginCommand. CommandBase.build() returns PluginCommand via
+ * reflection/protected wiring in Cartographer2. This helper isolates that integration point.
  */
-private fun Module.registerCommandViaReflection(cmd: io.github.bananapuncher714.cartographer.core.api.command.CommandBase) {
-    val method = Module::class.java.getDeclaredMethod("registerCommand", org.bukkit.command.PluginCommand::class.java)
+private fun Module.registerCommandViaReflection(
+    cmd: io.github.bananapuncher714.cartographer.core.api.command.CommandBase
+) {
+    val method =
+        Module::class
+            .java
+            .getDeclaredMethod("registerCommand", org.bukkit.command.PluginCommand::class.java)
     method.isAccessible = true
     method.invoke(this, cmd.build())
 }

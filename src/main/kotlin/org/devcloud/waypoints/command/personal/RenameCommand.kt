@@ -26,10 +26,15 @@ class RenameCommand(private val ctx: WayPointsBootstrap) {
         val player = sender as Player
         val new = p.getLast(String::class.java)
         val old = p.get(String::class.java, p.size() - 2)
-        val wp = ctx.waypointService.findOwned(player.uniqueId, old) ?: run {
-            ctx.messenger.send(player, ctx.lang.message("waypoint-not-found", "name" to old))
-            return
-        }
+        val wp =
+            ctx.waypointService.findOwned(player.uniqueId, old)
+                ?: run {
+                    ctx.messenger.send(
+                        player,
+                        ctx.lang.message("waypoint-not-found", "name" to old),
+                    )
+                    return
+                }
         if (CommandSupport.callCancellable(WaypointRenameEvent(player, wp, new))) return
         ctx.waypointService.renamePersonal(player.uniqueId, old, new).thenAccept { res ->
             ctx.async.runOnMain {

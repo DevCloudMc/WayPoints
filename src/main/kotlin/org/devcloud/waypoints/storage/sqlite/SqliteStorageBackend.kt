@@ -1,14 +1,14 @@
 package org.devcloud.waypoints.storage.sqlite
 
+import java.nio.file.Files
+import java.nio.file.Path
+import java.util.concurrent.CompletableFuture
 import org.devcloud.waypoints.domain.PlayerProfile
 import org.devcloud.waypoints.domain.Waypoint
 import org.devcloud.waypoints.domain.WaypointShare
 import org.devcloud.waypoints.storage.StorageBackend
 import org.devcloud.waypoints.storage.StorageSnapshot
 import org.devcloud.waypoints.storage.StorageType
-import java.nio.file.Files
-import java.nio.file.Path
-import java.util.concurrent.CompletableFuture
 
 class SqliteStorageBackend(dbPath: Path) : StorageBackend {
     init {
@@ -34,7 +34,9 @@ class SqliteStorageBackend(dbPath: Path) : StorageBackend {
             val sh = mutableListOf<WaypointShare>()
             val pr = mutableListOf<PlayerProfile>()
             c.prepareStatement("SELECT * FROM waypoints").use { ps ->
-                ps.executeQuery().use { rs -> while (rs.next()) wps += SqliteRowMappers.waypoint(rs) }
+                ps.executeQuery().use { rs ->
+                    while (rs.next()) wps += SqliteRowMappers.waypoint(rs)
+                }
             }
             c.prepareStatement("SELECT * FROM waypoint_shares").use { ps ->
                 ps.executeQuery().use { rs -> while (rs.next()) sh += SqliteRowMappers.share(rs) }

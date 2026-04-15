@@ -31,7 +31,10 @@ class DeleteCommand(private val ctx: WayPointsBootstrap) {
             ctx.async.runOnMain {
                 when (res) {
                     is Outcome.Ok ->
-                        ctx.messenger.send(player, ctx.lang.message("waypoint-deleted", "name" to name))
+                        ctx.messenger.send(
+                            player,
+                            ctx.lang.message("waypoint-deleted", "name" to name),
+                        )
                     is Outcome.Err ->
                         ctx.messenger.send(player, CommandSupport.renderError(ctx, res.error))
                 }

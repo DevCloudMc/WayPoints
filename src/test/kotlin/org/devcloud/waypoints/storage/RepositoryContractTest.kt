@@ -1,6 +1,12 @@
 package org.devcloud.waypoints.storage
 
 import be.seeseemelk.mockbukkit.MockBukkit
+import java.time.Instant
+import java.util.UUID
+import kotlin.test.assertEquals
+import kotlin.test.assertFalse
+import kotlin.test.assertNull
+import kotlin.test.assertTrue
 import org.bukkit.map.MapCursor
 import org.devcloud.waypoints.domain.PlayerProfile
 import org.devcloud.waypoints.domain.VisibilityState
@@ -13,12 +19,6 @@ import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
-import java.time.Instant
-import java.util.UUID
-import kotlin.test.assertEquals
-import kotlin.test.assertFalse
-import kotlin.test.assertNull
-import kotlin.test.assertTrue
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 abstract class RepositoryContractTest {

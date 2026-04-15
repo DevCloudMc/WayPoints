@@ -17,7 +17,8 @@ class UserWipeCommand(private val ctx: WayPointsBootstrap) {
     private fun execute(sender: CommandSender, args: Array<out String>, p: CommandParameters) {
         val target = p.getLast(OfflinePlayer::class.java)
         ctx.waypointService.forgetPlayer(target.uniqueId)
-        ctx.storage.shares.removeAllByOwner(target.uniqueId)
+        ctx.storage.shares
+            .removeAllByOwner(target.uniqueId)
             .thenCompose { ctx.storage.waypoints.deleteAllByOwner(target.uniqueId) }
             .thenAccept { count ->
                 ctx.async.runOnMain {

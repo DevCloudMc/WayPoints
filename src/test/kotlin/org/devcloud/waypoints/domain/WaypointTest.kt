@@ -1,11 +1,11 @@
 package org.devcloud.waypoints.domain
 
 import io.mockk.mockk
+import java.time.Instant
+import java.util.UUID
 import org.bukkit.map.MapCursor
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
-import java.time.Instant
-import java.util.UUID
 
 class WaypointTest {
     private val loc = WaypointLocation("w", 0.0, 0.0, 0.0, 0f, 0f)

@@ -1,11 +1,11 @@
 package org.devcloud.waypoints.service
 
-import org.devcloud.waypoints.domain.PlayerProfile
-import org.devcloud.waypoints.domain.VisibilityState
-import org.devcloud.waypoints.storage.StorageBackend
 import java.util.UUID
 import java.util.concurrent.CompletableFuture
 import java.util.concurrent.ConcurrentHashMap
+import org.devcloud.waypoints.domain.PlayerProfile
+import org.devcloud.waypoints.domain.VisibilityState
+import org.devcloud.waypoints.storage.StorageBackend
 
 class VisibilityService(private val storage: StorageBackend) {
     private val cache = ConcurrentHashMap<UUID, VisibilityState>()

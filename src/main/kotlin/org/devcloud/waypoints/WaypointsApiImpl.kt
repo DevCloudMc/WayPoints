@@ -1,10 +1,10 @@
 package org.devcloud.waypoints
 
+import java.util.UUID
 import org.devcloud.waypoints.api.WaypointsApi
 import org.devcloud.waypoints.domain.Waypoint
 import org.devcloud.waypoints.service.ShareService
 import org.devcloud.waypoints.service.WaypointService
-import java.util.UUID
 
 internal class WaypointsApiImpl(
     private val waypointService: WaypointService,
@@ -14,7 +14,8 @@ internal class WaypointsApiImpl(
 
     override fun listGlobal(): List<Waypoint> = waypointService.listGlobals()
 
-    override fun findOwned(owner: UUID, name: String): Waypoint? = waypointService.findOwned(owner, name)
+    override fun findOwned(owner: UUID, name: String): Waypoint? =
+        waypointService.findOwned(owner, name)
 
     override fun findGlobal(name: String): Waypoint? = waypointService.findGlobal(name)
 

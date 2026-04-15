@@ -19,10 +19,13 @@ object SqliteSchema {
                     created_at INTEGER NOT NULL,
                     UNIQUE(owner, scope, name)
                 )
-                """.trimIndent()
+                """
+                    .trimIndent()
             )
             st.executeUpdate("CREATE INDEX IF NOT EXISTS idx_waypoints_owner ON waypoints(owner)")
-            st.executeUpdate("CREATE INDEX IF NOT EXISTS idx_waypoints_scope_name ON waypoints(scope, name)")
+            st.executeUpdate(
+                "CREATE INDEX IF NOT EXISTS idx_waypoints_scope_name ON waypoints(scope, name)"
+            )
             st.executeUpdate(
                 """
                 CREATE TABLE IF NOT EXISTS waypoint_shares (
@@ -32,9 +35,12 @@ object SqliteSchema {
                     PRIMARY KEY (waypoint_id, shared_with),
                     FOREIGN KEY (waypoint_id) REFERENCES waypoints(id) ON DELETE CASCADE
                 )
-                """.trimIndent()
+                """
+                    .trimIndent()
             )
-            st.executeUpdate("CREATE INDEX IF NOT EXISTS idx_shares_target ON waypoint_shares(shared_with)")
+            st.executeUpdate(
+                "CREATE INDEX IF NOT EXISTS idx_shares_target ON waypoint_shares(shared_with)"
+            )
             st.executeUpdate(
                 """
                 CREATE TABLE IF NOT EXISTS player_profiles (
@@ -43,7 +49,8 @@ object SqliteSchema {
                     hide_global INTEGER NOT NULL DEFAULT 0,
                     hide_shared INTEGER NOT NULL DEFAULT 0
                 )
-                """.trimIndent()
+                """
+                    .trimIndent()
             )
         }
     }

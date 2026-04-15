@@ -35,8 +35,13 @@ class GlobalCreateCommand(private val ctx: WayPointsBootstrap) {
             ctx.async.runOnMain {
                 when (res) {
                     is Outcome.Ok -> {
-                        if (!CommandSupport.callCancellable(WaypointCreateEvent(player, res.value))) {
-                            ctx.messenger.send(player, ctx.lang.message("global-created", "name" to name))
+                        if (
+                            !CommandSupport.callCancellable(WaypointCreateEvent(player, res.value))
+                        ) {
+                            ctx.messenger.send(
+                                player,
+                                ctx.lang.message("global-created", "name" to name),
+                            )
                         } else {
                             ctx.waypointService.deleteGlobal(name)
                         }

@@ -4,13 +4,13 @@ import io.github.bananapuncher714.cartographer.core.api.command.CommandParameter
 import io.github.bananapuncher714.cartographer.core.api.command.SubCommand
 import io.github.bananapuncher714.cartographer.core.api.command.validator.sender.SenderValidatorPermission
 import io.github.bananapuncher714.cartographer.core.api.command.validator.sender.SenderValidatorPlayer
+import java.time.Duration
 import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
 import org.devcloud.waypoints.WayPointsBootstrap
 import org.devcloud.waypoints.api.event.WaypointTeleportEvent
 import org.devcloud.waypoints.command.CommandSupport
 import org.devcloud.waypoints.command.validator.OwnedWaypointValidator
-import java.time.Duration
 
 class TeleportCommand(private val ctx: WayPointsBootstrap) {
     fun build(): SubCommand =
@@ -27,10 +27,15 @@ class TeleportCommand(private val ctx: WayPointsBootstrap) {
             return
         }
         val name = p.getLast(String::class.java)
-        val wp = ctx.waypointService.findOwned(player.uniqueId, name) ?: run {
-            ctx.messenger.send(player, ctx.lang.message("waypoint-not-found", "name" to name))
-            return
-        }
+        val wp =
+            ctx.waypointService.findOwned(player.uniqueId, name)
+                ?: run {
+                    ctx.messenger.send(
+                        player,
+                        ctx.lang.message("waypoint-not-found", "name" to name),
+                    )
+                    return
+                }
         val bypass = player.hasPermission("waypoints.tp.cooldown.bypass")
         val remaining = ctx.teleportService.remainingCooldown(player.uniqueId, bypass)
         if (remaining > Duration.ZERO) {
@@ -40,13 +45,19 @@ class TeleportCommand(private val ctx: WayPointsBootstrap) {
             )
             return
         }
-        val resolved = wp.location.resolve() ?: run {
-            ctx.messenger.send(
-                player,
-                ctx.lang.message("world-missing", "world" to wp.location.worldName, "name" to wp.name),
-            )
-            return
-        }
+        val resolved =
+            wp.location.resolve()
+                ?: run {
+                    ctx.messenger.send(
+                        player,
+                        ctx.lang.message(
+                            "world-missing",
+                            "world" to wp.location.worldName,
+                            "name" to wp.name,
+                        ),
+                    )
+                    return
+                }
         if (CommandSupport.callCancellable(WaypointTeleportEvent(player, wp))) return
         ctx.teleportService.markUsed(player.uniqueId)
         ctx.messenger.send(player, ctx.lang.message("teleport-ok", "name" to wp.name))

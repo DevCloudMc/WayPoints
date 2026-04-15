@@ -24,24 +24,38 @@ class CreateCommand(private val ctx: WayPointsBootstrap) {
                 SubCommand(WaypointNameValidator())
                     .add(
                         SubCommand(IconValidator())
-                            .addSenderValidator(SenderValidatorPermission("waypoints.icon.extended"))
+                            .addSenderValidator(
+                                SenderValidatorPermission("waypoints.icon.extended")
+                            )
                             .defaultTo(this::executeWithIcon)
                     )
                     .defaultTo(this::executeDefaultIcon)
             )
             .defaultTo(this::executeMissing)
 
-    private fun executeMissing(sender: CommandSender, args: Array<out String>, p: CommandParameters) {
+    private fun executeMissing(
+        sender: CommandSender,
+        args: Array<out String>,
+        p: CommandParameters,
+    ) {
         ctx.messenger.send(sender, ctx.lang.message("usage-create"))
     }
 
-    private fun executeDefaultIcon(sender: CommandSender, args: Array<out String>, p: CommandParameters) {
+    private fun executeDefaultIcon(
+        sender: CommandSender,
+        args: Array<out String>,
+        p: CommandParameters,
+    ) {
         val player = sender as Player
         val name = p.getLast(String::class.java)
         runCreate(player, name, ctx.config.defaultIcon)
     }
 
-    private fun executeWithIcon(sender: CommandSender, args: Array<out String>, p: CommandParameters) {
+    private fun executeWithIcon(
+        sender: CommandSender,
+        args: Array<out String>,
+        p: CommandParameters,
+    ) {
         val player = sender as Player
         val icon = p.getLast(MapCursor.Type::class.java)
         val name = p.get(String::class.java, p.size() - 2)
@@ -55,11 +69,14 @@ class CreateCommand(private val ctx: WayPointsBootstrap) {
             return
         }
         val loc = WaypointLocation.of(player.location)
-        ctx.waypointService.createPersonal(player.uniqueId, name, icon, loc, limit).thenAccept { res ->
+        ctx.waypointService.createPersonal(player.uniqueId, name, icon, loc, limit).thenAccept { res
+            ->
             ctx.async.runOnMain {
                 when (res) {
                     is Outcome.Ok -> {
-                        if (!CommandSupport.callCancellable(WaypointCreateEvent(player, res.value))) {
+                        if (
+                            !CommandSupport.callCancellable(WaypointCreateEvent(player, res.value))
+                        ) {
                             ctx.messenger.send(
                                 player,
                                 ctx.lang.message("waypoint-created", "name" to res.value.name),

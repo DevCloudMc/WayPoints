@@ -1,13 +1,13 @@
 package org.devcloud.waypoints.service
 
-import org.devcloud.waypoints.domain.WaypointId
-import org.devcloud.waypoints.domain.WaypointShare
-import org.devcloud.waypoints.storage.StorageBackend
 import java.time.Clock
 import java.time.Instant
 import java.util.UUID
 import java.util.concurrent.CompletableFuture
 import java.util.concurrent.ConcurrentHashMap
+import org.devcloud.waypoints.domain.WaypointId
+import org.devcloud.waypoints.domain.WaypointShare
+import org.devcloud.waypoints.storage.StorageBackend
 
 class ShareService(
     private val storage: StorageBackend,

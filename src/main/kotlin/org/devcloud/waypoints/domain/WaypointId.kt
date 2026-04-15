@@ -8,6 +8,7 @@ value class WaypointId(val value: UUID) {
 
     companion object {
         fun random(): WaypointId = WaypointId(UUID.randomUUID())
+
         fun parse(s: String): WaypointId = WaypointId(UUID.fromString(s))
     }
 }

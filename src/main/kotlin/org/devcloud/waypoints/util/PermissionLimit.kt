@@ -4,8 +4,8 @@ import org.bukkit.permissions.Permissible
 
 object PermissionLimit {
     /**
-     * Walks the permissible's effective permissions and returns the highest integer suffix found on a node matching
-     * `${prefix}.<N>`. Returns 0 if none match. Negated permissions are ignored.
+     * Walks the permissible's effective permissions and returns the highest integer suffix found on
+     * a node matching `${prefix}.<N>`. Returns 0 if none match. Negated permissions are ignored.
      */
     fun compute(permissible: Permissible, prefix: String): Int {
         val needle = "$prefix."

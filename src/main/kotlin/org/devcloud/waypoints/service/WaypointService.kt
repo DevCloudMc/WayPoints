@@ -1,5 +1,10 @@
 package org.devcloud.waypoints.service
 
+import java.time.Clock
+import java.time.Instant
+import java.util.UUID
+import java.util.concurrent.CompletableFuture
+import java.util.concurrent.ConcurrentHashMap
 import org.bukkit.map.MapCursor
 import org.devcloud.waypoints.domain.Waypoint
 import org.devcloud.waypoints.domain.WaypointId
@@ -8,11 +13,6 @@ import org.devcloud.waypoints.domain.WaypointScope
 import org.devcloud.waypoints.domain.error.WaypointError
 import org.devcloud.waypoints.storage.StorageBackend
 import org.devcloud.waypoints.util.Outcome
-import java.time.Clock
-import java.time.Instant
-import java.util.UUID
-import java.util.concurrent.CompletableFuture
-import java.util.concurrent.ConcurrentHashMap
 
 class WaypointService(
     private val storage: StorageBackend,
@@ -72,11 +72,22 @@ class WaypointService(
         if (!nameRegex.matches(name)) return done(Outcome.Err(WaypointError.InvalidName(name)))
         val owned = personalCache.getOrPut(owner) { ConcurrentHashMap() }
         if (owned.containsKey(name)) return done(Outcome.Err(WaypointError.NameTaken(name)))
-        if (owned.size >= limit) return done(Outcome.Err(WaypointError.LimitReached(owned.size, limit)))
+        if (owned.size >= limit)
+            return done(Outcome.Err(WaypointError.LimitReached(owned.size, limit)))
         val wp =
-            Waypoint(WaypointId.random(), owner, name, icon, location, WaypointScope.PERSONAL, Instant.now(clock))
+            Waypoint(
+                WaypointId.random(),
+                owner,
+                name,
+                icon,
+                location,
+                WaypointScope.PERSONAL,
+                Instant.now(clock),
+            )
         owned[name] = wp
-        return storage.waypoints.save(wp).thenApply { Outcome.Ok(wp) as Outcome<Waypoint, WaypointError> }
+        return storage.waypoints.save(wp).thenApply {
+            Outcome.Ok(wp) as Outcome<Waypoint, WaypointError>
+        }
     }
 
     fun createGlobal(
@@ -87,19 +98,38 @@ class WaypointService(
         if (!nameRegex.matches(name)) return done(Outcome.Err(WaypointError.InvalidName(name)))
         if (globalCache.containsKey(name)) return done(Outcome.Err(WaypointError.NameTaken(name)))
         val wp =
-            Waypoint(WaypointId.random(), null, name, icon, location, WaypointScope.GLOBAL, Instant.now(clock))
+            Waypoint(
+                WaypointId.random(),
+                null,
+                name,
+                icon,
+                location,
+                WaypointScope.GLOBAL,
+                Instant.now(clock),
+            )
         globalCache[name] = wp
-        return storage.waypoints.save(wp).thenApply { Outcome.Ok(wp) as Outcome<Waypoint, WaypointError> }
+        return storage.waypoints.save(wp).thenApply {
+            Outcome.Ok(wp) as Outcome<Waypoint, WaypointError>
+        }
     }
 
-    fun deletePersonal(owner: UUID, name: String): CompletableFuture<Outcome<Waypoint, WaypointError>> {
-        val wp = personalCache[owner]?.remove(name) ?: return done(Outcome.Err(WaypointError.NotFound(name)))
-        return storage.waypoints.delete(wp.id).thenApply { Outcome.Ok(wp) as Outcome<Waypoint, WaypointError> }
+    fun deletePersonal(
+        owner: UUID,
+        name: String,
+    ): CompletableFuture<Outcome<Waypoint, WaypointError>> {
+        val wp =
+            personalCache[owner]?.remove(name)
+                ?: return done(Outcome.Err(WaypointError.NotFound(name)))
+        return storage.waypoints.delete(wp.id).thenApply {
+            Outcome.Ok(wp) as Outcome<Waypoint, WaypointError>
+        }
     }
 
     fun deleteGlobal(name: String): CompletableFuture<Outcome<Waypoint, WaypointError>> {
         val wp = globalCache.remove(name) ?: return done(Outcome.Err(WaypointError.NotFound(name)))
-        return storage.waypoints.delete(wp.id).thenApply { Outcome.Ok(wp) as Outcome<Waypoint, WaypointError> }
+        return storage.waypoints.delete(wp.id).thenApply {
+            Outcome.Ok(wp) as Outcome<Waypoint, WaypointError>
+        }
     }
 
     fun renamePersonal(
@@ -114,17 +144,24 @@ class WaypointService(
         val renamed = wp.copy(name = new)
         owned.remove(old)
         owned[new] = renamed
-        return storage.waypoints.save(renamed).thenApply { Outcome.Ok(renamed) as Outcome<Waypoint, WaypointError> }
+        return storage.waypoints.save(renamed).thenApply {
+            Outcome.Ok(renamed) as Outcome<Waypoint, WaypointError>
+        }
     }
 
-    fun renameGlobal(old: String, new: String): CompletableFuture<Outcome<Waypoint, WaypointError>> {
+    fun renameGlobal(
+        old: String,
+        new: String,
+    ): CompletableFuture<Outcome<Waypoint, WaypointError>> {
         if (!nameRegex.matches(new)) return done(Outcome.Err(WaypointError.InvalidName(new)))
         val wp = globalCache[old] ?: return done(Outcome.Err(WaypointError.NotFound(old)))
         if (globalCache.containsKey(new)) return done(Outcome.Err(WaypointError.NameTaken(new)))
         val renamed = wp.copy(name = new)
         globalCache.remove(old)
         globalCache[new] = renamed
-        return storage.waypoints.save(renamed).thenApply { Outcome.Ok(renamed) as Outcome<Waypoint, WaypointError> }
+        return storage.waypoints.save(renamed).thenApply {
+            Outcome.Ok(renamed) as Outcome<Waypoint, WaypointError>
+        }
     }
 
     private fun <T> done(value: T): CompletableFuture<T> = CompletableFuture.completedFuture(value)

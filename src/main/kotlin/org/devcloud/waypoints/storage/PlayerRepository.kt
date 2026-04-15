@@ -1,8 +1,8 @@
 package org.devcloud.waypoints.storage
 
-import org.devcloud.waypoints.domain.PlayerProfile
 import java.util.UUID
 import java.util.concurrent.CompletableFuture
+import org.devcloud.waypoints.domain.PlayerProfile
 
 interface PlayerRepository {
     fun loadProfile(uuid: UUID): CompletableFuture<PlayerProfile>

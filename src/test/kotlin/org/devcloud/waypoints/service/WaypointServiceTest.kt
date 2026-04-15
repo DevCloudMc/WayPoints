@@ -1,6 +1,15 @@
 package org.devcloud.waypoints.service
 
 import be.seeseemelk.mockbukkit.MockBukkit
+import java.nio.file.Path
+import java.time.Clock
+import java.time.Instant
+import java.time.ZoneOffset
+import java.util.UUID
+import kotlin.test.assertEquals
+import kotlin.test.assertNotNull
+import kotlin.test.assertNull
+import kotlin.test.assertTrue
 import org.bukkit.map.MapCursor
 import org.devcloud.waypoints.domain.WaypointLocation
 import org.devcloud.waypoints.domain.error.WaypointError
@@ -11,20 +20,10 @@ import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.io.TempDir
-import java.nio.file.Path
-import java.time.Clock
-import java.time.Instant
-import java.time.ZoneOffset
-import java.util.UUID
-import kotlin.test.assertEquals
-import kotlin.test.assertNotNull
-import kotlin.test.assertNull
-import kotlin.test.assertTrue
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class WaypointServiceTest {
-    @TempDir
-    lateinit var tmp: Path
+    @TempDir lateinit var tmp: Path
 
     private val owner = UUID.randomUUID()
     private val loc = WaypointLocation("w", 0.0, 64.0, 0.0, 0f, 0f)
@@ -43,7 +42,10 @@ class WaypointServiceTest {
         val backend = YamlStorageBackend(tmp.resolve("svc-${System.nanoTime()}.yml"))
         backend.init().get()
         val svc =
-            WaypointService(backend, Clock.fixed(Instant.parse("2026-01-01T00:00:00Z"), ZoneOffset.UTC))
+            WaypointService(
+                backend,
+                Clock.fixed(Instant.parse("2026-01-01T00:00:00Z"), ZoneOffset.UTC),
+            )
         svc.warmGlobals().get()
         svc.warmPlayer(owner).get()
         return svc

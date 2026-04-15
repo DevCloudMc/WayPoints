@@ -8,7 +8,8 @@ import org.bukkit.entity.Player
 import org.devcloud.waypoints.WayPointsBootstrap
 
 class ListCommand(private val ctx: WayPointsBootstrap) {
-    fun build(): SubCommand = SubCommand("list").addSenderValidator(SenderValidatorPlayer()).defaultTo(this::execute)
+    fun build(): SubCommand =
+        SubCommand("list").addSenderValidator(SenderValidatorPlayer()).defaultTo(this::execute)
 
     private fun execute(sender: CommandSender, args: Array<out String>, p: CommandParameters) {
         val player = sender as Player

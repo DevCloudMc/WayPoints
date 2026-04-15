@@ -1,9 +1,9 @@
 package org.devcloud.waypoints.storage
 
-import org.devcloud.waypoints.domain.Waypoint
-import org.devcloud.waypoints.domain.WaypointId
 import java.util.UUID
 import java.util.concurrent.CompletableFuture
+import org.devcloud.waypoints.domain.Waypoint
+import org.devcloud.waypoints.domain.WaypointId
 
 interface WaypointRepository {
     fun findById(id: WaypointId): CompletableFuture<Waypoint?>

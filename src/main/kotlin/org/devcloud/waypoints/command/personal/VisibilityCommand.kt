@@ -22,11 +22,19 @@ class VisibilityCommand(private val ctx: WayPointsBootstrap) {
             )
             .defaultTo { s, _, _ -> ctx.messenger.send(s, ctx.lang.message("usage-visibility")) }
 
-    private fun executeAllScope(sender: CommandSender, args: Array<out String>, p: CommandParameters) {
+    private fun executeAllScope(
+        sender: CommandSender,
+        args: Array<out String>,
+        p: CommandParameters,
+    ) {
         apply(sender as Player, p.getLast(Boolean::class.java), VisibilityScope.ALL)
     }
 
-    private fun executeWithScope(sender: CommandSender, args: Array<out String>, p: CommandParameters) {
+    private fun executeWithScope(
+        sender: CommandSender,
+        args: Array<out String>,
+        p: CommandParameters,
+    ) {
         val scope = p.getLast(VisibilityScope::class.java)
         val hide = p.get(Boolean::class.java, p.size() - 2)
         apply(sender as Player, hide, scope)

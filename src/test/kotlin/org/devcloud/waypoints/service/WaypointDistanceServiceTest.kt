@@ -2,12 +2,12 @@ package org.devcloud.waypoints.service
 
 import io.mockk.every
 import io.mockk.mockk
+import kotlin.test.assertEquals
+import kotlin.test.assertNull
 import org.bukkit.Location
 import org.bukkit.World
 import org.devcloud.waypoints.domain.WaypointLocation
 import org.junit.jupiter.api.Test
-import kotlin.test.assertEquals
-import kotlin.test.assertNull
 
 class WaypointDistanceServiceTest {
     @Test

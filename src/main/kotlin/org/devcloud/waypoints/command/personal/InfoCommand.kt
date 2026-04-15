@@ -3,11 +3,11 @@ package org.devcloud.waypoints.command.personal
 import io.github.bananapuncher714.cartographer.core.api.command.CommandParameters
 import io.github.bananapuncher714.cartographer.core.api.command.SubCommand
 import io.github.bananapuncher714.cartographer.core.api.command.validator.sender.SenderValidatorPlayer
+import kotlin.math.roundToInt
 import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
 import org.devcloud.waypoints.WayPointsBootstrap
 import org.devcloud.waypoints.command.validator.OwnedWaypointValidator
-import kotlin.math.roundToInt
 
 class InfoCommand(private val ctx: WayPointsBootstrap) {
     fun build(): SubCommand =
@@ -19,10 +19,15 @@ class InfoCommand(private val ctx: WayPointsBootstrap) {
     private fun execute(sender: CommandSender, args: Array<out String>, p: CommandParameters) {
         val player = sender as Player
         val name = p.getLast(String::class.java)
-        val wp = ctx.waypointService.findOwned(player.uniqueId, name) ?: run {
-            ctx.messenger.send(player, ctx.lang.message("waypoint-not-found", "name" to name))
-            return
-        }
+        val wp =
+            ctx.waypointService.findOwned(player.uniqueId, name)
+                ?: run {
+                    ctx.messenger.send(
+                        player,
+                        ctx.lang.message("waypoint-not-found", "name" to name),
+                    )
+                    return
+                }
         ctx.messenger.send(
             player,
             ctx.lang.message(

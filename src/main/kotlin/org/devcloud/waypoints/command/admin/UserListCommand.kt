@@ -22,7 +22,10 @@ class UserListCommand(private val ctx: WayPointsBootstrap) {
                     ctx.messenger.send(sender, ctx.lang.message("list-empty"))
                     return@runOnMain
                 }
-                ctx.messenger.send(sender, ctx.lang.message("list-header", "count" to list.size.toString()))
+                ctx.messenger.send(
+                    sender,
+                    ctx.lang.message("list-header", "count" to list.size.toString()),
+                )
                 for (wp in list) {
                     ctx.messenger.send(
                         sender,

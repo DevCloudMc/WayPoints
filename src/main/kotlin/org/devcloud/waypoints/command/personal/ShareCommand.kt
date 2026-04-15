@@ -20,7 +20,10 @@ class ShareCommand(private val ctx: WayPointsBootstrap) {
             .addSenderValidator(SenderValidatorPermission("waypoints.share"))
             .add(
                 SubCommand(InputValidatorPlayer())
-                    .add(SubCommand(OwnedWaypointValidator(ctx.waypointService)).defaultTo(this::execute))
+                    .add(
+                        SubCommand(OwnedWaypointValidator(ctx.waypointService))
+                            .defaultTo(this::execute)
+                    )
             )
             .defaultTo { s, _, _ -> ctx.messenger.send(s, ctx.lang.message("usage-share")) }
 
@@ -28,17 +31,26 @@ class ShareCommand(private val ctx: WayPointsBootstrap) {
         val player = sender as Player
         val name = p.getLast(String::class.java)
         val target = p.get(OfflinePlayer::class.java, p.size() - 2)
-        val wp = ctx.waypointService.findOwned(player.uniqueId, name) ?: run {
-            ctx.messenger.send(player, ctx.lang.message("waypoint-not-found", "name" to name))
-            return
-        }
+        val wp =
+            ctx.waypointService.findOwned(player.uniqueId, name)
+                ?: run {
+                    ctx.messenger.send(
+                        player,
+                        ctx.lang.message("waypoint-not-found", "name" to name),
+                    )
+                    return
+                }
         if (CommandSupport.callCancellable(WaypointShareEvent(player, wp, target.uniqueId))) return
         ctx.shareService.share(wp.id, target.uniqueId).thenAccept { added ->
             ctx.async.runOnMain {
                 if (added) {
                     ctx.messenger.send(
                         player,
-                        ctx.lang.message("share-added", "name" to wp.name, "target" to (target.name ?: "?")),
+                        ctx.lang.message(
+                            "share-added",
+                            "name" to wp.name,
+                            "target" to (target.name ?: "?"),
+                        ),
                     )
                 } else {
                     ctx.messenger.send(player, ctx.lang.message("share-duplicate"))

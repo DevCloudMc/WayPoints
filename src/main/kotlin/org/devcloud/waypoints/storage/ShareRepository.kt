@@ -1,9 +1,9 @@
 package org.devcloud.waypoints.storage
 
-import org.devcloud.waypoints.domain.WaypointId
-import org.devcloud.waypoints.domain.WaypointShare
 import java.util.UUID
 import java.util.concurrent.CompletableFuture
+import org.devcloud.waypoints.domain.WaypointId
+import org.devcloud.waypoints.domain.WaypointShare
 
 interface ShareRepository {
     fun add(share: WaypointShare): CompletableFuture<Boolean>

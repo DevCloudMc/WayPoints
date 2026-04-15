@@ -1,8 +1,8 @@
 package org.devcloud.waypoints.config
 
-import org.bukkit.configuration.file.YamlConfiguration
 import java.io.File
 import java.io.InputStream
+import org.bukkit.configuration.file.YamlConfiguration
 
 class YamlConfigLoader(private val dataFolder: File) {
     fun loadOrCopyDefault(name: String, defaults: () -> InputStream): YamlConfiguration {

@@ -1,22 +1,17 @@
 package org.devcloud.waypoints.api.event
 
+import java.util.UUID
 import org.bukkit.command.CommandSender
 import org.bukkit.event.HandlerList
 import org.devcloud.waypoints.domain.Waypoint
-import java.util.UUID
 
-class WaypointUnshareEvent(
-    sender: CommandSender,
-    waypoint: Waypoint,
-    val target: UUID,
-) : WaypointEvent(sender, waypoint) {
+class WaypointUnshareEvent(sender: CommandSender, waypoint: Waypoint, val target: UUID) :
+    WaypointEvent(sender, waypoint) {
     override fun getHandlers(): HandlerList = HANDLERS
 
     companion object {
-        @JvmStatic
-        private val HANDLERS = HandlerList()
+        @JvmStatic private val HANDLERS = HandlerList()
 
-        @JvmStatic
-        fun getHandlerList(): HandlerList = HANDLERS
+        @JvmStatic fun getHandlerList(): HandlerList = HANDLERS
     }
 }
