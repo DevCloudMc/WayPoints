@@ -1,9 +1,6 @@
 # WayPoints
 
 A waypoint addon for [Cartographer2](https://github.com/BananaPuncher714/Cartographer2). Lets players pin named locations on the minimap with a live distance readout, and lets staff publish server-wide points of interest.
-
-> **Status: 2.0 rewrite in progress.** The `legacy-1.x` branch preserves the original implementation. The `main` branch is being rebuilt with a clean storage layer, async I/O, a richer command set, and an event API for other addons.
-
 ---
 
 ## Why this exists
