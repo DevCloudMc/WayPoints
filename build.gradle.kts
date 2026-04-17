@@ -19,17 +19,18 @@ java { toolchain.languageVersion.set(JavaLanguageVersion.of(21)) }
 kotlin { jvmToolchain(21) }
 
 repositories {
-    mavenLocal()
     mavenCentral()
     maven("https://repo.papermc.io/repository/maven-public/")
-    maven("https://jitpack.io")
-    maven("https://repo.aaaaahhhhhhh.com/releases") // Cartographer2
     maven("https://repo.extendedclip.com/content/repositories/placeholderapi/")
 }
 
+// Cartographer2 API is vendored under libs/ because its upstream repo
+// (repo.aaaaahhhhhhh.com) is unreliable and its JitPack coordinates don't resolve.
+val cartographer2 = files("libs/cartographer2_api-2.15.11.jar")
+
 dependencies {
     compileOnly("io.papermc.paper:paper-api:1.21.1-R0.1-SNAPSHOT")
-    compileOnly("io.github.bananapuncher714:cartographer2_api:2.15.11")
+    compileOnly(cartographer2)
     compileOnly("me.clip:placeholderapi:2.11.6")
 
     implementation("org.xerial:sqlite-jdbc:3.46.1.0")
@@ -40,7 +41,7 @@ dependencies {
     testImplementation("io.mockk:mockk:1.13.12")
     testImplementation("com.github.seeseemelk:MockBukkit-v1.21:3.133.2")
     testImplementation("io.papermc.paper:paper-api:1.21.1-R0.1-SNAPSHOT")
-    testImplementation("io.github.bananapuncher714:cartographer2_api:2.15.11")
+    testImplementation(cartographer2)
 }
 
 tasks.test {
