@@ -1,0 +1,59 @@
+name: Build
+
+on:
+  push:
+    branches: [main, develop, 'feature/**', 'task/**', 'fix/**']
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  build:
+    name: Build + test on JDK 21
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-home-cache-cleanup: true
+
+      - name: Spotless check
+        run: ./gradlew --no-daemon spotlessCheck
+
+      - name: Detekt
+        run: ./gradlew --no-daemon detekt
+
+      - name: Build + tests
+        run: ./gradlew --no-daemon build shadowJar
+
+      - name: Publish test report
+        if: always()
+        uses: mikepenz/action-junit-report@v5
+        with:
+          report_paths: '**/build/test-results/test/TEST-*.xml'
+          fail_on_failure: true
+          require_tests: false
+
+      - name: Resolve JAR path
+        id: jar
+        run: echo "path=$(ls build/libs/WayPoints-*.jar | head -n1)" >> "$GITHUB_OUTPUT"
+
+      - name: Upload shaded JAR
+        uses: actions/upload-artifact@v4
+        with:
+          name: WayPoints-jar
+          path: ${{ steps.jar.outputs.path }}
+          if-no-files-found: error
+          retention-days: 14

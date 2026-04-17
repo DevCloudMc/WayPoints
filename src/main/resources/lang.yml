@@ -1,31 +1,72 @@
-prefix: "&f[&cWayPoints&f] > "
-pointName: "%name% §r%distance% m"
-pointCreated: "&aPoint {pointName} has been created"
-pointReCreated: "&aPoint {pointName} has been recreated"
-pointDeleted: "&cPoint {pointName} has been removed"
-pointNotFound: "&cPoint {pointName} not found"
-pointListDelete: "&c[Click to remove]"
-pointListEmpty: "&cThe list is empty"
-hoverMessage: "&eClick here to remove this point"
-permissionDeny: "&cYou don't have permission to do this"
-chooseType: "&cChoose a type of cursor"
-chooseWayPoint: "&cChoose a waypoint"
-unknownCursorType: "&f{cursorType} &cnot a type of cursor. Choose another type"
-hide: "&eYou hide waypoints"
-hideTypeError: "&eAvailable types: {types}"
-unHide: "&eYou unhide waypoints"
-enterName: "&cEnter the name"
-differentType: "&c{cursorType} Not a type of cursor. Choose another type"
-maxPoints: "&cYou have too much points"
-wayPointNameHint: "&eEnter the name of the waypoint"
-help:
-  - "Commands:"
-  - "/wp help &7- &aThis message"
-  - "/wp hide &7- &aHide points"
-  - "/wp create <name> &7- &aCreate point"
-  - "/wp delete <name> &7- &aRemove point"
-  - "/wp list &7- &aPoints list"
-adminHelp:
-  - "/wp global create &e<name> <type> &7- &aCreate global point"
-  - "/wp global delete &e<name> &7- &aRemove global point"
-  - "/wp global list &7- &aGlobal points list"
+prefix: "<gray>[<gold>WayPoints</gold>]</gray>"
+
+# Generic
+internal-error: "<red>Internal error, check the server log.</red>"
+player-only: "<red>Players only.</red>"
+usage-create: "<yellow>Usage: /wp create <name> [icon]</yellow>"
+usage-delete: "<yellow>Usage: /wp delete <name></yellow>"
+usage-rename: "<yellow>Usage: /wp rename <old> <new></yellow>"
+usage-info: "<yellow>Usage: /wp info <name></yellow>"
+usage-tp: "<yellow>Usage: /wp tp <name></yellow>"
+usage-share: "<yellow>Usage: /wp share <player> <name></yellow>"
+usage-unshare: "<yellow>Usage: /wp unshare <player> <name></yellow>"
+usage-visibility: "<yellow>Usage: /wp visibility <show|hide> [personal|global|shared|all]</yellow>"
+usage-global-create: "<yellow>Usage: /wp global create <name> <icon></yellow>"
+usage-admin-migrate: "<yellow>Usage: /wp admin migrate <sqlite|yaml> <sqlite|yaml></yellow>"
+
+# Personal operations
+waypoint-created: "<green>Created <white><name></white>.</green>"
+waypoint-deleted: "<green>Deleted <white><name></white>.</green>"
+waypoint-renamed: "<green>Renamed <white><old></white> to <white><new></white>.</green>"
+waypoint-info: "<gray>Name:</gray> <white><name></white> <gray>| World:</gray> <white><world></white> <gray>| Coords:</gray> <white><x>, <y>, <z></white>"
+list-empty: "<yellow>You have no waypoints.</yellow>"
+list-header: "<gray>― <gold>Waypoints</gold> (<count>) ―</gray>"
+list-entry: "<gray>• </gray><white><name></white> <gray>(<scope>, <world>)</gray>"
+waypoint-not-found: "<red>No waypoint named <name>.</red>"
+
+# Errors
+invalid-name: "<red>Names must match <gray>[A-Za-z0-9_-]{1,32}</gray>.</red>"
+name-taken: "<red>You already have a waypoint named <name>.</red>"
+limit-reached: "<red>You can only have <max> waypoints. Delete one first.</red>"
+invalid-icon: "<red>Unknown icon <icon>. Try: <hint>.</red>"
+world-missing: "<red>The world <world> for waypoint <name> is not loaded.</red>"
+
+# Teleport
+teleport-ok: "<green>Teleporting to <name>...</green>"
+teleport-cooldown: "<yellow>Wait <seconds>s before teleporting again.</yellow>"
+teleport-disabled: "<red>Teleport is disabled on this server.</red>"
+
+# Share
+share-added: "<green>Shared <name> with <target>.</green>"
+share-removed: "<green>Unshared <name> from <target>.</green>"
+share-duplicate: "<yellow>Already shared.</yellow>"
+share-not-found: "<red>No such share to remove.</red>"
+
+# Visibility
+visibility-set: "<green>Visibility for <scope> set to <state>.</green>"
+visibility-invalid-scope: "<red>Unknown scope. Use personal, global, shared or all.</red>"
+
+# Global
+global-created: "<green>Created global waypoint <name>.</green>"
+global-deleted: "<green>Deleted global waypoint <name>.</green>"
+global-renamed: "<green>Renamed global waypoint <old> to <new>.</green>"
+global-list-header: "<gray>― <gold>Global waypoints</gold> (<count>) ―</gray>"
+global-list-empty: "<yellow>No global waypoints.</yellow>"
+
+# Admin
+admin-reload-ok: "<green>Config reloaded.</green>"
+admin-migrate-ok: "<green>Migrated <count> waypoints from <from> to <to>.</green>"
+admin-migrate-same: "<red>Source and target storage types are the same.</red>"
+admin-migrate-failed: "<red>Migration failed: <reason></red>"
+admin-user-wiped: "<green>Wiped <count> waypoints from <player>.</green>"
+
+# Help
+help-header: "<gray>― <gold>WayPoints help</gold> ―</gray>"
+help-create: "<yellow>/wp create <name> [icon]</yellow> <gray>— create a waypoint here</gray>"
+help-delete: "<yellow>/wp delete <name></yellow> <gray>— delete a waypoint</gray>"
+help-rename: "<yellow>/wp rename <old> <new></yellow> <gray>— rename a waypoint</gray>"
+help-list: "<yellow>/wp list</yellow> <gray>— list your waypoints</gray>"
+help-info: "<yellow>/wp info <name></yellow> <gray>— show waypoint details</gray>"
+help-tp: "<yellow>/wp tp <name></yellow> <gray>— teleport to a waypoint</gray>"
+help-share: "<yellow>/wp share <player> <name></yellow> <gray>— share with another player</gray>"
+help-visibility: "<yellow>/wp visibility <show|hide> [scope]</yellow> <gray>— show or hide waypoints</gray>"

@@ -1,0 +1,56 @@
+build:
+  maxIssues: 0
+  weights:
+    complexity: 2
+
+style:
+  MaxLineLength:
+    maxLineLength: 140
+  MagicNumber:
+    active: false
+  ReturnCount:
+    max: 6
+  UnusedParameter:
+    active: false
+  UnusedPrivateProperty:
+    active: true
+  LoopWithTooManyJumpStatements:
+    active: false
+  BracesOnIfStatements:
+    # Single-line `if (x) return` guards are kept brace-less to stay compatible with ktfmt,
+    # which rewrites braced one-liners back to this form. Multi-line branches must have braces.
+    active: true
+    singleLine: 'necessary'
+    multiLine: 'always'
+  BracesOnWhenStatements:
+    active: true
+    singleLine: 'necessary'
+    multiLine: 'consistent'
+  MandatoryBracesLoops:
+    active: true
+
+performance:
+  SpreadOperator:
+    active: false
+
+exceptions:
+  TooGenericExceptionCaught:
+    active: false
+  PrintStackTrace:
+    active: false
+
+complexity:
+  LongMethod:
+    threshold: 80
+  TooManyFunctions:
+    thresholdInClasses: 25
+  ComplexCondition:
+    threshold: 5
+  CyclomaticComplexMethod:
+    threshold: 20
+
+naming:
+  MemberNameEqualsClassName:
+    active: false
+  FunctionNaming:
+    excludes: ['**/test/**']
