@@ -213,20 +213,3 @@ Available events:
 Output: `build/libs/WayPoints-<version>.jar`.
 
 CI builds are produced by `.github/workflows/build.yml` on every push and PR. Releases are attached to GitHub releases by `.github/workflows/release.yml` after a tag matches the project version.
-
----
-
-## Versioning and compatibility
-
-WayPoints follows [Semantic Versioning](https://semver.org/).
-
-- **2.x** — current rewrite. Targets Paper 1.21+, Java 21.
-- **1.x** — legacy, frozen on the `legacy-1.x` branch. Not recommended for new installs.
-
-Data written by 1.x is migratable via `/wp admin migrate` after a one-time import (see release notes).
-
----
-
-## License
-
-See `LICENSE` in the repository root.
