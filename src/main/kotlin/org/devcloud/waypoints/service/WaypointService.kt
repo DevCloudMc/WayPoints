@@ -98,8 +98,8 @@ class WaypointService(
                 Instant.now(clock),
             )
         owned[name] = wp
-        return storage.waypoints.save(wp).thenApply {
-            Outcome.Ok(wp) as Outcome<Waypoint, WaypointError>
+        return persisted(storage.waypoints.save(wp), wp) {
+            owned.remove(name, wp)
         }
     }
 
@@ -125,8 +125,8 @@ class WaypointService(
                 Instant.now(clock),
             )
         globalCache[name] = wp
-        return storage.waypoints.save(wp).thenApply {
-            Outcome.Ok(wp) as Outcome<Waypoint, WaypointError>
+        return persisted(storage.waypoints.save(wp), wp) {
+            globalCache.remove(name, wp)
         }
     }
 
@@ -137,15 +137,15 @@ class WaypointService(
         val wp =
             personalCache[owner]?.remove(name)
                 ?: return done(Outcome.Err(WaypointError.NotFound(name)))
-        return storage.waypoints.delete(wp.id).thenApply {
-            Outcome.Ok(wp) as Outcome<Waypoint, WaypointError>
+        return persisted(storage.waypoints.delete(wp.id), wp) {
+            personalCache[owner]?.putIfAbsent(name, wp)
         }
     }
 
     fun deleteGlobal(name: String): CompletableFuture<Outcome<Waypoint, WaypointError>> {
         val wp = globalCache.remove(name) ?: return done(Outcome.Err(WaypointError.NotFound(name)))
-        return storage.waypoints.delete(wp.id).thenApply {
-            Outcome.Ok(wp) as Outcome<Waypoint, WaypointError>
+        return persisted(storage.waypoints.delete(wp.id), wp) {
+            globalCache.putIfAbsent(name, wp)
         }
     }
 
@@ -165,8 +165,9 @@ class WaypointService(
         val renamed = wp.copy(name = new)
         owned.remove(old)
         owned[new] = renamed
-        return storage.waypoints.save(renamed).thenApply {
-            Outcome.Ok(renamed) as Outcome<Waypoint, WaypointError>
+        return persisted(storage.waypoints.save(renamed), renamed) {
+            owned.remove(new, renamed)
+            owned.putIfAbsent(old, wp)
         }
     }
 
@@ -184,8 +185,23 @@ class WaypointService(
         val renamed = wp.copy(name = new)
         globalCache.remove(old)
         globalCache[new] = renamed
-        return storage.waypoints.save(renamed).thenApply {
-            Outcome.Ok(renamed) as Outcome<Waypoint, WaypointError>
+        return persisted(storage.waypoints.save(renamed), renamed) {
+            globalCache.remove(new, renamed)
+            globalCache.putIfAbsent(old, wp)
+        }
+    }
+
+    // The cache is written first so the minimap updates at once; a failed write undoes it.
+    private fun persisted(
+        write: CompletableFuture<*>,
+        wp: Waypoint,
+        rollback: () -> Unit,
+    ): CompletableFuture<Outcome<Waypoint, WaypointError>> = write.handle { _, e ->
+        if (e == null) {
+            Outcome.Ok(wp)
+        } else {
+            rollback()
+            Outcome.Err(WaypointError.Storage(e))
         }
     }
 

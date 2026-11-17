@@ -57,6 +57,7 @@ global-list-empty: "<yellow>No global waypoints.</yellow>"
 admin-reload-ok: "<green>Config reloaded.</green>"
 admin-migrate-ok: "<green>Migrated <count> waypoints from <from> to <to>.</green>"
 admin-migrate-same: "<red>Source and target storage types are the same.</red>"
+admin-migrate-not-active: "<red>Migration reads from the active storage only. Migrate, then change storage.type and restart.</red>"
 admin-migrate-failed: "<red>Migration failed: <reason></red>"
 admin-user-wiped: "<green>Wiped <count> waypoints from <player>.</green>"
 

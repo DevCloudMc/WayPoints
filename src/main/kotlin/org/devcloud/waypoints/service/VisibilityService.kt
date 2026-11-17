@@ -23,7 +23,15 @@ class VisibilityService(private val storage: StorageBackend) {
     fun get(uuid: UUID): VisibilityState = cache[uuid] ?: VisibilityState.ALL_VISIBLE
 
     fun set(uuid: UUID, state: VisibilityState): CompletableFuture<Unit> {
-        cache[uuid] = state
-        return storage.players.saveProfile(PlayerProfile(uuid, state))
+        val previous = cache.put(uuid, state)
+        return storage.players.saveProfile(PlayerProfile(uuid, state)).whenComplete { _, e ->
+            if (e != null) {
+                if (previous == null) {
+                    cache.remove(uuid, state)
+                } else {
+                    cache.replace(uuid, state, previous)
+                }
+            }
+        }
     }
 }

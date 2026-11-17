@@ -1,7 +1,9 @@
 package org.devcloud.waypoints.command
 
+import java.util.logging.Level
 import net.kyori.adventure.text.Component
 import org.bukkit.Bukkit
+import org.bukkit.command.CommandSender
 import org.devcloud.waypoints.WayPointsBootstrap
 import org.devcloud.waypoints.api.event.WaypointEvent
 import org.devcloud.waypoints.domain.error.WaypointError
@@ -28,8 +30,18 @@ internal object CommandSupport {
             WaypointError.NotOwner,
             WaypointError.InsufficientPermission -> ctx.lang.message("internal-error")
 
-            is WaypointError.Storage -> ctx.lang.message("internal-error")
+            is WaypointError.Storage ->
+                ctx.lang.message("internal-error").also {
+                    ctx.module.logger.log(Level.SEVERE, "Storage write failed", err.cause)
+                }
         }
+
+    // Tail for command futures that talk to storage directly: without it a failure vanishes.
+    fun reportFailure(ctx: WayPointsBootstrap, sender: CommandSender, e: Throwable): Void? {
+        ctx.module.logger.log(Level.SEVERE, "Storage call failed", e)
+        ctx.async.runOnMain { ctx.messenger.send(sender, ctx.lang.message("internal-error")) }
+        return null
+    }
 
     /** Call a cancellable Bukkit event on the main thread; returns true when cancelled. */
     fun callCancellable(event: WaypointEvent): Boolean {

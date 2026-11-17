@@ -22,7 +22,7 @@ import org.mockbukkit.mockbukkit.MockBukkit
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 abstract class RepositoryContractTest {
-    protected abstract fun newBackend(): StorageBackend
+    protected abstract fun newBackend(name: String = "test-${System.nanoTime()}"): StorageBackend
 
     @BeforeAll
     fun bukkitSetup() {
@@ -167,5 +167,33 @@ abstract class RepositoryContractTest {
         assertEquals(snap.waypoints.toSet(), backend2.exportAll().get().waypoints.toSet())
         backend.close()
         backend2.close()
+    }
+
+    @Test
+    fun `import replaces existing data`() {
+        val backend = newBackend()
+        backend.init().get()
+        val owner = UUID.randomUUID()
+        val old = personal(owner, "old")
+        val new = personal(owner, "new")
+        backend.waypoints.save(old).get()
+        backend.importAll(StorageSnapshot(listOf(new), emptyList(), emptyList())).get()
+        assertEquals(listOf(new), backend.exportAll().get().waypoints)
+        backend.close()
+    }
+
+    @Test
+    fun `writes issued before close are on disk`() {
+        val name = "reopen-${System.nanoTime()}"
+        val backend = newBackend(name)
+        backend.init().get()
+        val owner = UUID.randomUUID()
+        repeat(50) { backend.waypoints.save(personal(owner, "wp$it")) }
+        backend.close()
+
+        val reopened = newBackend(name)
+        reopened.init().get()
+        assertEquals(50, reopened.waypoints.listByOwner(owner).get().size)
+        reopened.close()
     }
 }

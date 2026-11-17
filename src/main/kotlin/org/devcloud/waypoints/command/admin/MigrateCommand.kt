@@ -47,15 +47,14 @@ class MigrateCommand(private val ctx: WayPointsBootstrap) {
             ctx.messenger.send(sender, ctx.lang.message("admin-migrate-same"))
             return
         }
-
+        // Reading or writing the live files through a second backend loses data, so the source
+        // is always the running backend and the target is never the active type.
+        val source = ctx.storage
+        if (from != source.type) {
+            ctx.messenger.send(sender, ctx.lang.message("admin-migrate-not-active"))
+            return
+        }
         val dataFolder = ctx.module.dataFolder.toPath()
-        val source: StorageBackend =
-            when (from) {
-                StorageType.SQLITE ->
-                    SqliteStorageBackend(dataFolder.resolve(ctx.config.sqliteFile))
-
-                StorageType.YAML -> YamlStorageBackend(dataFolder.resolve(ctx.config.yamlFile))
-            }
         val target: StorageBackend =
             when (to) {
                 StorageType.SQLITE ->
@@ -65,14 +64,12 @@ class MigrateCommand(private val ctx: WayPointsBootstrap) {
             }
 
         source
-            .init()
-            .thenCompose { source.exportAll() }
+            .exportAll()
             .thenCompose { snapshot ->
                 target.init().thenCompose { target.importAll(snapshot) }.thenApply { snapshot }
             }
             .whenComplete { snapshot, err ->
                 ctx.async.runOnMain {
-                    runCatching { source.close() }
                     runCatching { target.close() }
                     if (err != null) {
                         ctx.messenger.send(

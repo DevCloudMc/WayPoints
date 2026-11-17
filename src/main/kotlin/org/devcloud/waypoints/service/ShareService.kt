@@ -34,12 +34,17 @@ class ShareService(
     fun share(id: WaypointId, target: UUID): CompletableFuture<Boolean> {
         val set = cache.computeIfAbsent(target) { ConcurrentHashMap.newKeySet() }
         if (!set.add(id)) return CompletableFuture.completedFuture(false)
-        return storage.shares.add(WaypointShare(id, target, Instant.now(clock)))
+        return storage.shares.add(WaypointShare(id, target, Instant.now(clock))).whenComplete { _, e
+            ->
+            if (e != null) set.remove(id)
+        }
     }
 
     fun unshare(id: WaypointId, target: UUID): CompletableFuture<Boolean> {
         val removed = cache[target]?.remove(id) == true
         if (!removed) return CompletableFuture.completedFuture(false)
-        return storage.shares.remove(id, target)
+        return storage.shares.remove(id, target).whenComplete { _, e ->
+            if (e != null) cache[target]?.add(id)
+        }
     }
 }

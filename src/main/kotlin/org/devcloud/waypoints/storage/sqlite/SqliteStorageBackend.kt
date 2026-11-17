@@ -42,12 +42,27 @@ class SqliteStorageBackend(dbPath: Path) : StorageBackend {
         StorageSnapshot(wps, sh, pr)
     }
 
+    // Every pool task runs on one thread in submission order, so the writes between the first
+    // and the last task below belong to this transaction.
     override fun importAll(snapshot: StorageSnapshot): CompletableFuture<Unit> {
-        val futures = mutableListOf<CompletableFuture<*>>()
-        snapshot.waypoints.forEach { futures += waypoints.save(it) }
-        snapshot.shares.forEach { futures += shares.add(it) }
-        snapshot.profiles.forEach { futures += players.saveProfile(it) }
-        return CompletableFuture.allOf(*futures.toTypedArray()).thenApply {}
+        val steps = mutableListOf<CompletableFuture<*>>()
+        steps += pool.submit { c ->
+            c.autoCommit = false
+            c.createStatement().use { st ->
+                st.executeUpdate("DELETE FROM waypoint_shares")
+                st.executeUpdate("DELETE FROM waypoints")
+                st.executeUpdate("DELETE FROM player_profiles")
+            }
+        }
+        snapshot.waypoints.forEach { steps += waypoints.save(it) }
+        snapshot.shares.forEach { steps += shares.add(it) }
+        snapshot.profiles.forEach { steps += players.saveProfile(it) }
+        return pool.submit { c ->
+            val failed = steps.firstOrNull { it.isCompletedExceptionally }
+            if (failed == null) c.commit() else c.rollback()
+            c.autoCommit = true
+            if (failed != null) failed.join()
+        }
     }
 
     override fun close() = pool.close()

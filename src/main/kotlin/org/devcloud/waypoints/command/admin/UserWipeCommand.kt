@@ -7,6 +7,7 @@ import io.github.bananapuncher714.cartographer.core.api.command.validator.sender
 import org.bukkit.OfflinePlayer
 import org.bukkit.command.CommandSender
 import org.devcloud.waypoints.WayPointsBootstrap
+import org.devcloud.waypoints.command.CommandSupport
 
 class UserWipeCommand(private val ctx: WayPointsBootstrap) {
     fun build(): SubCommand =
@@ -32,5 +33,6 @@ class UserWipeCommand(private val ctx: WayPointsBootstrap) {
                     )
                 }
             }
+            .exceptionally { CommandSupport.reportFailure(ctx, sender, it) }
     }
 }

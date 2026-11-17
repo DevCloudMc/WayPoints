@@ -1,10 +1,14 @@
 package org.devcloud.waypoints.service
 
+import io.mockk.every
+import io.mockk.mockk
+import java.io.IOException
 import java.nio.file.Path
 import java.time.Clock
 import java.time.Instant
 import java.time.ZoneOffset
 import java.util.UUID
+import java.util.concurrent.CompletableFuture
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 import kotlin.test.assertNull
@@ -12,6 +16,7 @@ import kotlin.test.assertTrue
 import org.bukkit.map.MapCursor
 import org.devcloud.waypoints.domain.WaypointLocation
 import org.devcloud.waypoints.domain.error.WaypointError
+import org.devcloud.waypoints.storage.StorageBackend
 import org.devcloud.waypoints.storage.yaml.YamlStorageBackend
 import org.devcloud.waypoints.util.Outcome
 import org.junit.jupiter.api.AfterAll
@@ -111,5 +116,16 @@ class WaypointServiceTest {
         assertNotNull(svc.findGlobal("spawn"))
         svc.deleteGlobal("spawn").get()
         assertNull(svc.findGlobal("spawn"))
+    }
+
+    @Test
+    fun `failed write rolls the cache back and reports a storage error`() {
+        val backend = mockk<StorageBackend>()
+        every { backend.waypoints.save(any()) } returns
+            CompletableFuture.failedFuture(IOException("disk full"))
+        val svc = WaypointService(backend)
+        val r = svc.createPersonal(owner, "home", MapCursor.Type.PLAYER_OFF_MAP, loc, 5).get()
+        assertTrue((r as Outcome.Err).error is WaypointError.Storage)
+        assertNull(svc.findOwned(owner, "home"))
     }
 }

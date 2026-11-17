@@ -17,5 +17,5 @@ sealed class WaypointError {
 
     data object InsufficientPermission : WaypointError()
 
-    data class Storage(val cause: StorageError) : WaypointError()
+    data class Storage(val cause: Throwable) : WaypointError()
 }

@@ -8,6 +8,6 @@ import org.junit.jupiter.api.io.TempDir
 class SqliteStorageBackendTest : RepositoryContractTest() {
     @TempDir lateinit var tmp: Path
 
-    override fun newBackend(): StorageBackend =
-        SqliteStorageBackend(tmp.resolve("test-${System.nanoTime()}.db"))
+    override fun newBackend(name: String): StorageBackend =
+        SqliteStorageBackend(tmp.resolve("$name.db"))
 }

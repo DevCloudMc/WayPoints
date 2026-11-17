@@ -43,21 +43,24 @@ class ShareCommand(private val ctx: WayPointsBootstrap) {
         if (CommandSupport.callCancellable(WaypointShareEvent(player, wp, target.uniqueId))) {
             return
         }
-        ctx.shareService.share(wp.id, target.uniqueId).thenAccept { added ->
-            ctx.async.runOnMain {
-                if (added) {
-                    ctx.messenger.send(
-                        player,
-                        ctx.lang.message(
-                            "share-added",
-                            "name" to wp.name,
-                            "target" to (target.name ?: "?"),
-                        ),
-                    )
-                } else {
-                    ctx.messenger.send(player, ctx.lang.message("share-duplicate"))
+        ctx.shareService
+            .share(wp.id, target.uniqueId)
+            .thenAccept { added ->
+                ctx.async.runOnMain {
+                    if (added) {
+                        ctx.messenger.send(
+                            player,
+                            ctx.lang.message(
+                                "share-added",
+                                "name" to wp.name,
+                                "target" to (target.name ?: "?"),
+                            ),
+                        )
+                    } else {
+                        ctx.messenger.send(player, ctx.lang.message("share-duplicate"))
+                    }
                 }
             }
-        }
+            .exceptionally { CommandSupport.reportFailure(ctx, player, it) }
     }
 }

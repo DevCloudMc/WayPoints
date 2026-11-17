@@ -7,6 +7,7 @@ import java.time.Instant
 import java.util.*
 import java.util.concurrent.CompletableFuture
 import java.util.concurrent.Executors
+import java.util.concurrent.TimeUnit
 import org.bukkit.configuration.file.YamlConfiguration
 import org.devcloud.waypoints.domain.IconRegistry
 import org.devcloud.waypoints.domain.PlayerProfile
@@ -174,6 +175,8 @@ class YamlStorageBackend(private val file: Path) : StorageBackend {
 
     override fun close() {
         executor.shutdown()
+        // Queued writes must reach disk before the server stops.
+        executor.awaitTermination(10, TimeUnit.SECONDS)
     }
 
     private fun <T> submit(block: () -> T): CompletableFuture<T> {
