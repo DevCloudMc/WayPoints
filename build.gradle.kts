@@ -1,12 +1,11 @@
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
-import java.net.URI
 
 plugins {
-    kotlin("jvm") version "2.0.20"
-    id("com.gradleup.shadow") version "8.3.3"
-    id("io.gitlab.arturbosch.detekt") version "1.23.7"
-    id("com.diffplug.spotless") version "6.25.0"
-    id("org.jetbrains.dokka") version "1.9.20"
+    kotlin("jvm") version "2.4.21"
+    id("com.gradleup.shadow") version "9.6.1"
+    id("io.gitlab.arturbosch.detekt") version "1.23.8"
+    id("com.diffplug.spotless") version "8.11.0"
+    id("org.jetbrains.dokka") version "2.3.0"
     `maven-publish`
 }
 
@@ -64,14 +63,15 @@ tasks.register<Jar>("sourcesJar") {
 
 tasks.register<Jar>("javadocJar") {
     archiveClassifier.set("javadoc")
-    from(tasks.named("dokkaHtml"))
-    dependsOn(tasks.named("dokkaHtml"))
+    from(tasks.dokkaGeneratePublicationHtml.flatMap { it.outputDirectory })
 }
 
-tasks.named<org.jetbrains.dokka.gradle.DokkaTask>("dokkaHtml") {
-    moduleName.set("WayPoints")
-    dokkaSourceSets.configureEach {
+dokka {
+    dokkaPublications.html {
+        moduleName.set("WayPoints")
         includes.from("docs/module.md")
+    }
+    dokkaSourceSets.configureEach {
         jdkVersion.set(21)
         reportUndocumented.set(false)
         skipEmptyPackages.set(true)
@@ -82,7 +82,7 @@ tasks.named<org.jetbrains.dokka.gradle.DokkaTask>("dokkaHtml") {
             )
             suppress.set(true)
         }
-        externalDocumentationLink { url.set(URI("https://jd.papermc.io/paper/1.21.1/").toURL()) }
+        externalDocumentationLinks.register("paper") { url("https://jd.papermc.io/paper/1.21.1/") }
     }
 }
 
@@ -94,11 +94,11 @@ detekt {
 
 spotless {
     kotlin {
-        ktfmt("0.52").kotlinlangStyle()
+        ktfmt("0.64").kotlinlangStyle()
         target("src/**/*.kt")
     }
     kotlinGradle {
-        ktfmt("0.52").kotlinlangStyle()
+        ktfmt("0.64").kotlinlangStyle()
         target("*.gradle.kts")
     }
 }
