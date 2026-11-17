@@ -7,10 +7,9 @@ import java.util.concurrent.CompletableFuture
 import java.util.concurrent.Executors
 
 class ConnectionPool(private val dbPath: Path) : AutoCloseable {
-    private val executor =
-        Executors.newSingleThreadExecutor { r ->
-            Thread(r, "WayPoints-SQLite").apply { isDaemon = true }
-        }
+    private val executor = Executors.newSingleThreadExecutor { r ->
+        Thread(r, "WayPoints-SQLite").apply { isDaemon = true }
+    }
 
     private val connection: Connection by lazy {
         Class.forName("org.sqlite.JDBC")

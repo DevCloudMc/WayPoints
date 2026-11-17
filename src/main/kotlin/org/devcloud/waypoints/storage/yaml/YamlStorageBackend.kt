@@ -24,10 +24,9 @@ import org.devcloud.waypoints.storage.StorageType
 import org.devcloud.waypoints.storage.WaypointRepository
 
 class YamlStorageBackend(private val file: Path) : StorageBackend {
-    private val executor =
-        Executors.newSingleThreadExecutor { r ->
-            Thread(r, "WayPoints-YAML").apply { isDaemon = true }
-        }
+    private val executor = Executors.newSingleThreadExecutor { r ->
+        Thread(r, "WayPoints-YAML").apply { isDaemon = true }
+    }
 
     private var cache: StorageSnapshot = StorageSnapshot(emptyList(), emptyList(), emptyList())
 

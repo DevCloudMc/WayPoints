@@ -24,24 +24,23 @@ class SqliteStorageBackend(dbPath: Path) : StorageBackend {
 
     override fun init(): CompletableFuture<Unit> = pool.submit { c -> SqliteSchema.apply(c) }
 
-    override fun exportAll(): CompletableFuture<StorageSnapshot> =
-        pool.submit { c ->
-            val wps = mutableListOf<Waypoint>()
-            val sh = mutableListOf<WaypointShare>()
-            val pr = mutableListOf<PlayerProfile>()
-            c.prepareStatement("SELECT * FROM waypoints").use { ps ->
-                ps.executeQuery().use { rs ->
-                    while (rs.next()) wps += SqliteRowMappers.waypoint(rs)
-                }
+    override fun exportAll(): CompletableFuture<StorageSnapshot> = pool.submit { c ->
+        val wps = mutableListOf<Waypoint>()
+        val sh = mutableListOf<WaypointShare>()
+        val pr = mutableListOf<PlayerProfile>()
+        c.prepareStatement("SELECT * FROM waypoints").use { ps ->
+            ps.executeQuery().use { rs ->
+                while (rs.next()) wps += SqliteRowMappers.waypoint(rs)
             }
-            c.prepareStatement("SELECT * FROM waypoint_shares").use { ps ->
-                ps.executeQuery().use { rs -> while (rs.next()) sh += SqliteRowMappers.share(rs) }
-            }
-            c.prepareStatement("SELECT * FROM player_profiles").use { ps ->
-                ps.executeQuery().use { rs -> while (rs.next()) pr += SqliteRowMappers.profile(rs) }
-            }
-            StorageSnapshot(wps, sh, pr)
         }
+        c.prepareStatement("SELECT * FROM waypoint_shares").use { ps ->
+            ps.executeQuery().use { rs -> while (rs.next()) sh += SqliteRowMappers.share(rs) }
+        }
+        c.prepareStatement("SELECT * FROM player_profiles").use { ps ->
+            ps.executeQuery().use { rs -> while (rs.next()) pr += SqliteRowMappers.profile(rs) }
+        }
+        StorageSnapshot(wps, sh, pr)
+    }
 
     override fun importAll(snapshot: StorageSnapshot): CompletableFuture<Unit> {
         val futures = mutableListOf<CompletableFuture<*>>()
