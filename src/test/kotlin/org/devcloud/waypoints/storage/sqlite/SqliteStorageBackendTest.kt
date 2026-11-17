@@ -16,7 +16,6 @@ class SqliteStorageBackendTest : RepositoryContractTest() {
 
     @Test
     fun `two global waypoints with the same name are rejected`() {
-        val backend = newBackend().also { it.init().get() }
         backend.waypoints.save(global("spawn")).get()
         assertFailsWith<ExecutionException> { backend.waypoints.save(global("spawn")).get() }
     }
