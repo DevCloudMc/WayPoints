@@ -31,15 +31,7 @@ class UnshareCommand(private val ctx: WayPointsBootstrap) {
         val player = sender as Player
         val name = p.getLast(String::class.java)
         val target = p.get(OfflinePlayer::class.java, p.size() - 2)
-        val wp =
-            ctx.waypointService.findOwned(player.uniqueId, name)
-                ?: run {
-                    ctx.messenger.send(
-                        player,
-                        ctx.lang.message("waypoint-not-found", "name" to name),
-                    )
-                    return
-                }
+        val wp = CommandSupport.findOwnedOrReply(ctx, player, name) ?: return
         if (CommandSupport.callCancellable(WaypointUnshareEvent(player, wp, target.uniqueId))) {
             return
         }

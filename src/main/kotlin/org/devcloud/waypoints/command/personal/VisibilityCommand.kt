@@ -7,7 +7,7 @@ import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
 import org.devcloud.waypoints.WayPointsBootstrap
 import org.devcloud.waypoints.command.CommandSupport
-import org.devcloud.waypoints.command.validator.ScopeValidator
+import org.devcloud.waypoints.command.validator.EnumValidator
 import org.devcloud.waypoints.command.validator.ShowHideValidator
 import org.devcloud.waypoints.command.validator.VisibilityScope
 import org.devcloud.waypoints.domain.VisibilityState
@@ -18,7 +18,10 @@ class VisibilityCommand(private val ctx: WayPointsBootstrap) {
             .addSenderValidator(SenderValidatorPlayer())
             .add(
                 SubCommand(ShowHideValidator())
-                    .add(SubCommand(ScopeValidator()).defaultTo(this::executeWithScope))
+                    .add(
+                        SubCommand(EnumValidator(VisibilityScope.entries))
+                            .defaultTo(this::executeWithScope)
+                    )
                     .defaultTo(this::executeAllScope)
             )
             .defaultTo { s, _, _ -> ctx.messenger.send(s, ctx.lang.message("usage-visibility")) }

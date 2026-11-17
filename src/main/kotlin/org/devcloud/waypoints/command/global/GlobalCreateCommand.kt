@@ -13,8 +13,6 @@ import org.devcloud.waypoints.command.CommandSupport
 import org.devcloud.waypoints.command.validator.IconValidator
 import org.devcloud.waypoints.command.validator.WaypointNameValidator
 import org.devcloud.waypoints.domain.WaypointLocation
-import org.devcloud.waypoints.domain.error.WaypointError
-import org.devcloud.waypoints.util.Outcome
 
 class GlobalCreateCommand(private val ctx: WayPointsBootstrap) {
     fun build(): SubCommand =
@@ -32,28 +30,12 @@ class GlobalCreateCommand(private val ctx: WayPointsBootstrap) {
         val icon = p.getLast(MapCursor.Type::class.java)
         val name = p.get(String::class.java, p.size() - 2)
         val loc = WaypointLocation.of(player.location)
-        ctx.waypointService
-            .createGlobal(name, icon, loc) {
+        val result =
+            ctx.waypointService.createGlobal(name, icon, loc) {
                 !CommandSupport.callCancellable(WaypointCreateEvent(player, it))
             }
-            .thenAccept { res ->
-                ctx.async.runOnMain {
-                    when (res) {
-                        is Outcome.Ok ->
-                            ctx.messenger.send(
-                                player,
-                                ctx.lang.message("global-created", "name" to name),
-                            )
-
-                        is Outcome.Err ->
-                            if (res.error != WaypointError.Cancelled) {
-                                ctx.messenger.send(
-                                    player,
-                                    CommandSupport.renderError(ctx, res.error),
-                                )
-                            }
-                    }
-                }
-            }
+        CommandSupport.reply(ctx, player, result) {
+            ctx.lang.message("global-created", "name" to name)
+        }
     }
 }

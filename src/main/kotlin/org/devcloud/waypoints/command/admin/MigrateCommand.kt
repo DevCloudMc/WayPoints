@@ -2,41 +2,19 @@ package org.devcloud.waypoints.command.admin
 
 import io.github.bananapuncher714.cartographer.core.api.command.CommandParameters
 import io.github.bananapuncher714.cartographer.core.api.command.SubCommand
-import io.github.bananapuncher714.cartographer.core.api.command.validator.InputValidator
 import io.github.bananapuncher714.cartographer.core.api.command.validator.sender.SenderValidatorPermission
 import org.bukkit.command.CommandSender
 import org.devcloud.waypoints.WayPointsBootstrap
-import org.devcloud.waypoints.storage.StorageBackend
+import org.devcloud.waypoints.command.validator.EnumValidator
 import org.devcloud.waypoints.storage.StorageType
-import org.devcloud.waypoints.storage.sqlite.SqliteStorageBackend
-import org.devcloud.waypoints.storage.yaml.YamlStorageBackend
-
-private class StorageTypeValidator : InputValidator<StorageType> {
-    override fun isValid(
-        sender: CommandSender,
-        input: Array<out String>,
-        args: Array<out String>,
-    ): Boolean {
-        val v = input.firstOrNull()?.uppercase() ?: return false
-        return runCatching { StorageType.valueOf(v) }.isSuccess
-    }
-
-    override fun get(sender: CommandSender, args: Array<out String>): StorageType =
-        StorageType.valueOf(args.first().uppercase())
-
-    override fun getTabCompletes(
-        sender: CommandSender,
-        args: Array<out String>,
-    ): Collection<String> = StorageType.values().map { it.name.lowercase() }
-}
 
 class MigrateCommand(private val ctx: WayPointsBootstrap) {
     fun build(): SubCommand =
         SubCommand("migrate")
             .addSenderValidator(SenderValidatorPermission("waypoints.admin"))
             .add(
-                SubCommand(StorageTypeValidator())
-                    .add(SubCommand(StorageTypeValidator()).defaultTo(this::execute))
+                SubCommand(EnumValidator(StorageType.entries))
+                    .add(SubCommand(EnumValidator(StorageType.entries)).defaultTo(this::execute))
             )
             .defaultTo { s, _, _ -> ctx.messenger.send(s, ctx.lang.message("usage-admin-migrate")) }
 
@@ -54,14 +32,7 @@ class MigrateCommand(private val ctx: WayPointsBootstrap) {
             ctx.messenger.send(sender, ctx.lang.message("admin-migrate-not-active"))
             return
         }
-        val dataFolder = ctx.module.dataFolder.toPath()
-        val target: StorageBackend =
-            when (to) {
-                StorageType.SQLITE ->
-                    SqliteStorageBackend(dataFolder.resolve(ctx.config.sqliteFile))
-
-                StorageType.YAML -> YamlStorageBackend(dataFolder.resolve(ctx.config.yamlFile))
-            }
+        val target = ctx.openBackend(to)
 
         source
             .exportAll()

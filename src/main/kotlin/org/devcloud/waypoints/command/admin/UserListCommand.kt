@@ -21,25 +21,7 @@ class UserListCommand(private val ctx: WayPointsBootstrap) {
             .listByOwner(target.uniqueId)
             .thenAccept { list ->
                 ctx.async.runOnMain {
-                    if (list.isEmpty()) {
-                        ctx.messenger.send(sender, ctx.lang.message("list-empty"))
-                        return@runOnMain
-                    }
-                    ctx.messenger.send(
-                        sender,
-                        ctx.lang.message("list-header", "count" to list.size.toString()),
-                    )
-                    for (wp in list) {
-                        ctx.messenger.send(
-                            sender,
-                            ctx.lang.message(
-                                "list-entry",
-                                "name" to wp.name,
-                                "scope" to wp.scope.name.lowercase(),
-                                "world" to wp.location.worldName,
-                            ),
-                        )
-                    }
+                    CommandSupport.sendList(ctx, sender, list, "list-empty", "list-header")
                 }
             }
             .exceptionally { CommandSupport.reportFailure(ctx, sender, it) }

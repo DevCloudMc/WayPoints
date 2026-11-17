@@ -5,6 +5,7 @@ import io.github.bananapuncher714.cartographer.core.api.command.SubCommand
 import io.github.bananapuncher714.cartographer.core.api.command.validator.sender.SenderValidatorPermission
 import org.bukkit.command.CommandSender
 import org.devcloud.waypoints.WayPointsBootstrap
+import org.devcloud.waypoints.command.CommandSupport
 
 class GlobalListCommand(private val ctx: WayPointsBootstrap) {
     fun build(): SubCommand =
@@ -13,25 +14,12 @@ class GlobalListCommand(private val ctx: WayPointsBootstrap) {
             .defaultTo(this::execute)
 
     private fun execute(sender: CommandSender, args: Array<out String>, p: CommandParameters) {
-        val wps = ctx.waypointService.listGlobals()
-        if (wps.isEmpty()) {
-            ctx.messenger.send(sender, ctx.lang.message("global-list-empty"))
-            return
-        }
-        ctx.messenger.send(
+        CommandSupport.sendList(
+            ctx,
             sender,
-            ctx.lang.message("global-list-header", "count" to wps.size.toString()),
+            ctx.waypointService.listGlobals(),
+            "global-list-empty",
+            "global-list-header",
         )
-        for (wp in wps) {
-            ctx.messenger.send(
-                sender,
-                ctx.lang.message(
-                    "list-entry",
-                    "name" to wp.name,
-                    "scope" to "global",
-                    "world" to wp.location.worldName,
-                ),
-            )
-        }
     }
 }

@@ -10,7 +10,6 @@ import org.devcloud.waypoints.api.event.WaypointRenameEvent
 import org.devcloud.waypoints.command.CommandSupport
 import org.devcloud.waypoints.command.validator.OwnedWaypointValidator
 import org.devcloud.waypoints.command.validator.WaypointNameValidator
-import org.devcloud.waypoints.util.Outcome
 
 class RenameCommand(private val ctx: WayPointsBootstrap) {
     fun build(): SubCommand =
@@ -26,31 +25,16 @@ class RenameCommand(private val ctx: WayPointsBootstrap) {
         val player = sender as Player
         val new = p.getLast(String::class.java)
         val old = p.get(String::class.java, p.size() - 2)
-        val wp =
-            ctx.waypointService.findOwned(player.uniqueId, old)
-                ?: run {
-                    ctx.messenger.send(
-                        player,
-                        ctx.lang.message("waypoint-not-found", "name" to old),
-                    )
-                    return
-                }
+        val wp = CommandSupport.findOwnedOrReply(ctx, player, old) ?: return
         if (CommandSupport.callCancellable(WaypointRenameEvent(player, wp, new))) {
             return
         }
-        ctx.waypointService.renamePersonal(player.uniqueId, old, new).thenAccept { res ->
-            ctx.async.runOnMain {
-                when (res) {
-                    is Outcome.Ok ->
-                        ctx.messenger.send(
-                            player,
-                            ctx.lang.message("waypoint-renamed", "old" to old, "new" to new),
-                        )
-
-                    is Outcome.Err ->
-                        ctx.messenger.send(player, CommandSupport.renderError(ctx, res.error))
-                }
-            }
+        CommandSupport.reply(
+            ctx,
+            player,
+            ctx.waypointService.renamePersonal(player.uniqueId, old, new),
+        ) {
+            ctx.lang.message("waypoint-renamed", "old" to old, "new" to new)
         }
     }
 }

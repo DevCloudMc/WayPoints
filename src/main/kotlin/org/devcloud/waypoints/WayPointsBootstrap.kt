@@ -66,9 +66,9 @@ class WayPointsBootstrap(val module: WayPointsModule) {
     private val hostPlugin: JavaPlugin by lazy { Cartographer.getInstance() }
 
     fun start() {
-        loadConfigs()
+        reload()
         async = Async(hostPlugin)
-        storage = openBackend(config)
+        storage = openBackend(config.storageType)
         storage.init().get()
 
         waypointService = WaypointService(storage)
@@ -142,10 +142,6 @@ class WayPointsBootstrap(val module: WayPointsModule) {
 
     // storage.* is read once at startup; everything else is read on use.
     fun reload() {
-        loadConfigs()
-    }
-
-    private fun loadConfigs() {
         val loader = YamlConfigLoader(module.dataFolder)
         val cfgYaml =
             loader.loadOrCopyDefault("config.yml") {
@@ -164,11 +160,11 @@ class WayPointsBootstrap(val module: WayPointsModule) {
         messenger = Messenger(lang.message("prefix"))
     }
 
-    private fun openBackend(cfg: ConfigSchema): StorageBackend {
+    fun openBackend(type: StorageType): StorageBackend {
         val dataFolder = module.dataFolder.toPath()
-        return when (cfg.storageType) {
-            StorageType.SQLITE -> SqliteStorageBackend(dataFolder.resolve(cfg.sqliteFile))
-            StorageType.YAML -> YamlStorageBackend(dataFolder.resolve(cfg.yamlFile))
+        return when (type) {
+            StorageType.SQLITE -> SqliteStorageBackend(dataFolder.resolve(config.sqliteFile))
+            StorageType.YAML -> YamlStorageBackend(dataFolder.resolve(config.yamlFile))
         }
     }
 }

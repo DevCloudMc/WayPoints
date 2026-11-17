@@ -9,7 +9,6 @@ import org.devcloud.waypoints.WayPointsBootstrap
 import org.devcloud.waypoints.api.event.WaypointDeleteEvent
 import org.devcloud.waypoints.command.CommandSupport
 import org.devcloud.waypoints.command.validator.OwnedWaypointValidator
-import org.devcloud.waypoints.util.Outcome
 
 class DeleteCommand(private val ctx: WayPointsBootstrap) {
     fun build(): SubCommand =
@@ -21,27 +20,16 @@ class DeleteCommand(private val ctx: WayPointsBootstrap) {
     private fun execute(sender: CommandSender, args: Array<out String>, p: CommandParameters) {
         val player = sender as Player
         val name = p.getLast(String::class.java)
-        val wp = ctx.waypointService.findOwned(player.uniqueId, name)
-        if (wp == null) {
-            ctx.messenger.send(player, ctx.lang.message("waypoint-not-found", "name" to name))
-            return
-        }
+        val wp = CommandSupport.findOwnedOrReply(ctx, player, name) ?: return
         if (CommandSupport.callCancellable(WaypointDeleteEvent(player, wp))) {
             return
         }
-        ctx.waypointService.deletePersonal(player.uniqueId, name).thenAccept { res ->
-            ctx.async.runOnMain {
-                when (res) {
-                    is Outcome.Ok ->
-                        ctx.messenger.send(
-                            player,
-                            ctx.lang.message("waypoint-deleted", "name" to name),
-                        )
-
-                    is Outcome.Err ->
-                        ctx.messenger.send(player, CommandSupport.renderError(ctx, res.error))
-                }
-            }
+        CommandSupport.reply(
+            ctx,
+            player,
+            ctx.waypointService.deletePersonal(player.uniqueId, name),
+        ) {
+            ctx.lang.message("waypoint-deleted", "name" to name)
         }
     }
 }
