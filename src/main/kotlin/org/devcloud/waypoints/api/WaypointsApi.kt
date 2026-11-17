@@ -4,7 +4,7 @@ import java.util.*
 import org.devcloud.waypoints.domain.Waypoint
 
 /**
- * Read-only facade exposing the WayPoints 2.x state to downstream addons and plugins.
+ * Read-only facade exposing the WayPoints state to downstream addons and plugins.
  *
  * The implementation is registered with [org.bukkit.plugin.ServicesManager] during
  * [org.bukkit.event.server.PluginEnableEvent] handling for the Cartographer2 plugin, which means

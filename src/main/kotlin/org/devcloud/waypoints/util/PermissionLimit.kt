@@ -26,4 +26,6 @@ object PermissionLimit {
         }
         return max
     }
+
+    fun effective(permitted: Int, default: Int): Int = if (permitted > 0) permitted else default
 }

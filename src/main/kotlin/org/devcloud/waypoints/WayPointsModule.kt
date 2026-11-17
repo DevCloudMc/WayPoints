@@ -12,7 +12,7 @@ class WayPointsModule : Module() {
         bootstrap = b
         try {
             b.start()
-            logger.info("WayPoints 4.0.0 enabled.")
+            logger.info("WayPoints $version enabled.")
         } catch (e: Exception) {
             logger.severe("Failed to start WayPoints: ${e.message}")
             e.printStackTrace()

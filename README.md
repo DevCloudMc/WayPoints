@@ -58,7 +58,7 @@ WayPoints does **not** require Vault. Limits are driven by permission nodes, and
 ## Installation
 
 1. Install [Cartographer2](https://github.com/BananaPuncher714/Cartographer2) on your Paper server.
-2. Drop `WayPoints-2.x.jar` into `plugins/Cartographer2/modules/`.
+2. Drop `WayPoints-<version>.jar` into `plugins/Cartographer2/modules/`.
 3. Restart, or run `/cartographer reload modules`.
 4. Default config and language files are generated under `plugins/Cartographer2/modules/WayPoints/`.
 
@@ -139,6 +139,10 @@ display:
   # Round coordinates in the label to this many decimals.
   label-distance-decimals: 0
 
+limits:
+  # Personal waypoint limit for players without a `waypoints.limit.<N>` permission.
+  default: 10
+
 teleport:
   enabled: true
   cooldown-seconds: 10
@@ -150,7 +154,7 @@ defaults:
   icon: PLAYER_OFF_MAP
 ```
 
-Limits are **not** in `config.yml` — they are permission nodes. Example bundle for LuckPerms:
+`limits.default` applies only to players with no `waypoints.limit.<N>` node (for example operators). Any explicit node wins over it. Example permission bundle for LuckPerms:
 
 ```
 group.default permission set waypoints.limit.3 true

@@ -19,8 +19,28 @@ class HelpCommand(private val ctx: WayPointsBootstrap) {
                 "help-info",
                 "help-tp",
                 "help-share",
+                "help-unshare",
                 "help-visibility",
-            )
+            ) +
+                (if (sender.hasPermission("waypoints.global")) GLOBAL_KEYS else emptyList()) +
+                (if (sender.hasPermission("waypoints.admin")) ADMIN_KEYS else emptyList())
         for (key in keys) ctx.messenger.send(sender, ctx.lang.message(key))
+    }
+
+    private companion object {
+        val GLOBAL_KEYS =
+            listOf(
+                "help-global-create",
+                "help-global-delete",
+                "help-global-rename",
+                "help-global-list",
+            )
+        val ADMIN_KEYS =
+            listOf(
+                "help-admin-reload",
+                "help-admin-migrate",
+                "help-admin-user-list",
+                "help-admin-user-wipe",
+            )
     }
 }

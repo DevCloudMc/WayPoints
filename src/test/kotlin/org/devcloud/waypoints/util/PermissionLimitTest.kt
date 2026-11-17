@@ -23,6 +23,12 @@ class PermissionLimitTest {
     }
 
     @Test
+    fun `effective uses default only when no permission matched`() {
+        assertEquals(10, PermissionLimit.effective(0, 10))
+        assertEquals(3, PermissionLimit.effective(3, 10))
+    }
+
+    @Test
     fun `returns highest matching permission`() {
         val p = mockk<Permissible>()
         every { p.effectivePermissions } returns

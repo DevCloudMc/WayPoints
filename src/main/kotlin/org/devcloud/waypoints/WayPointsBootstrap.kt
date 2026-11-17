@@ -122,7 +122,9 @@ class WayPointsBootstrap(val module: WayPointsModule) {
         BStatsBootstrap.start(hostPlugin, config)
 
         if (Bukkit.getPluginManager().isPluginEnabled("PlaceholderAPI")) {
-            expansion = WaypointsExpansion(waypointService, VERSION).also { it.register() }
+            expansion =
+                WaypointsExpansion(waypointService, module.version) { config.defaultLimit }
+                    .also { it.register() }
         }
     }
 
@@ -168,9 +170,5 @@ class WayPointsBootstrap(val module: WayPointsModule) {
             StorageType.SQLITE -> SqliteStorageBackend(dataFolder.resolve(cfg.sqliteFile))
             StorageType.YAML -> YamlStorageBackend(dataFolder.resolve(cfg.yamlFile))
         }
-    }
-
-    companion object {
-        const val VERSION = "4.0.0"
     }
 }

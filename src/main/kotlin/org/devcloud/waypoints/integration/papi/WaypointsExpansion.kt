@@ -10,6 +10,7 @@ import org.devcloud.waypoints.util.PermissionLimit
 class WaypointsExpansion(
     private val waypointService: WaypointService,
     private val pluginVersion: String,
+    private val defaultLimit: () -> Int,
 ) : PlaceholderExpansion() {
     override fun getIdentifier() = "waypoints"
 
@@ -23,7 +24,12 @@ class WaypointsExpansion(
         val online = player?.player ?: return null
         return when (params.lowercase()) {
             "count" -> waypointService.listOwned(online.uniqueId).size.toString()
-            "max" -> PermissionLimit.compute(online, "waypoints.limit").toString()
+            "max" ->
+                PermissionLimit.effective(
+                        PermissionLimit.compute(online, "waypoints.limit"),
+                        defaultLimit(),
+                    )
+                    .toString()
             "nearest_name" -> nearest(online)?.first.orEmpty()
             "nearest_distance" -> nearest(online)?.second?.let { "%.1f".format(it) }.orEmpty()
             else -> null

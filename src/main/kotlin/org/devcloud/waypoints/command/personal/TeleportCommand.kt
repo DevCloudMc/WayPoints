@@ -41,7 +41,10 @@ class TeleportCommand(private val ctx: WayPointsBootstrap) {
         if (remaining > Duration.ZERO) {
             ctx.messenger.send(
                 player,
-                ctx.lang.message("teleport-cooldown", "seconds" to remaining.seconds.toString()),
+                ctx.lang.message(
+                    "teleport-cooldown",
+                    "seconds" to ((remaining.toMillis() + 999) / 1000).toString(),
+                ),
             )
             return
         }

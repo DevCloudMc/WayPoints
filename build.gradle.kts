@@ -45,6 +45,10 @@ dependencies {
     testImplementation(cartographer2)
 }
 
+tasks.processResources {
+    filesMatching("module.json") { expand("version" to project.version) }
+}
+
 tasks.test {
     useJUnitPlatform()
     testLogging { events("passed", "failed", "skipped") }

@@ -16,6 +16,10 @@ display:
   # Round coordinates in the label to this many decimals.
   label-distance-decimals: 0
 
+limits:
+  # Personal waypoint limit for players without a `waypoints.limit.<N>` permission.
+  default: 10
+
 teleport:
   enabled: true
   cooldown-seconds: 10
