@@ -1,6 +1,7 @@
 prefix: "<gray>[<gold>WayPoints</gold>]</gray>"
 
 # Generic
+still-loading: "<yellow>Your waypoints are still loading, try again in a moment.</yellow>"
 internal-error: "<red>Internal error, check the server log.</red>"
 player-only: "<red>Players only.</red>"
 usage-create: "<yellow>Usage: /wp create <name> [icon]</yellow>"

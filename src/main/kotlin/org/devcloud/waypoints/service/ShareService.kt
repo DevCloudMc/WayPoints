@@ -31,20 +31,21 @@ class ShareService(
 
     fun listFor(target: UUID): Set<WaypointId> = cache[target]?.toSet().orEmpty()
 
+    // A missing cache entry means the target is offline: storage is then the only source of truth.
     fun share(id: WaypointId, target: UUID): CompletableFuture<Boolean> {
-        val set = cache.computeIfAbsent(target) { ConcurrentHashMap.newKeySet() }
-        if (!set.add(id)) return CompletableFuture.completedFuture(false)
+        val set = cache[target]
+        if (set != null && !set.add(id)) return CompletableFuture.completedFuture(false)
         return storage.shares.add(WaypointShare(id, target, Instant.now(clock))).whenComplete { _, e
             ->
-            if (e != null) set.remove(id)
+            if (e != null) set?.remove(id)
         }
     }
 
     fun unshare(id: WaypointId, target: UUID): CompletableFuture<Boolean> {
-        val removed = cache[target]?.remove(id) == true
-        if (!removed) return CompletableFuture.completedFuture(false)
+        val set = cache[target]
+        if (set != null && !set.remove(id)) return CompletableFuture.completedFuture(false)
         return storage.shares.remove(id, target).whenComplete { _, e ->
-            if (e != null) cache[target]?.add(id)
+            if (e != null) set?.add(id)
         }
     }
 }

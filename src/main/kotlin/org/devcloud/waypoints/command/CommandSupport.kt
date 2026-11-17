@@ -27,6 +27,7 @@ internal object CommandSupport {
             is WaypointError.WorldMissing ->
                 ctx.lang.message("world-missing", "world" to err.worldName, "name" to "")
 
+            WaypointError.NotLoaded -> ctx.lang.message("still-loading")
             WaypointError.NotOwner,
             WaypointError.InsufficientPermission -> ctx.lang.message("internal-error")
 

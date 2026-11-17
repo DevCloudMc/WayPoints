@@ -13,6 +13,8 @@ sealed class WaypointError {
 
     data class WorldMissing(val worldName: String) : WaypointError()
 
+    data object NotLoaded : WaypointError()
+
     data object NotOwner : WaypointError()
 
     data object InsufficientPermission : WaypointError()

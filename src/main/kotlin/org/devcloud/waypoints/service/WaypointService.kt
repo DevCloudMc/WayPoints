@@ -23,12 +23,19 @@ class WaypointService(
     private val personalCache = ConcurrentHashMap<UUID, ConcurrentHashMap<String, Waypoint>>()
     private val globalCache = ConcurrentHashMap<String, Waypoint>()
 
+    // shortcut: entries of owners who logged out stay here so their shared waypoints keep
+    // rendering; it grows up to the number of stored waypoints, evict when that gets large.
+    private val byId = ConcurrentHashMap<WaypointId, Waypoint>()
+
     fun warmGlobals(): CompletableFuture<Unit> =
         storage.waypoints
             .listGlobal()
             .thenAccept { list ->
                 globalCache.clear()
-                list.forEach { globalCache[it.name] = it }
+                list.forEach {
+                    globalCache[it.name] = it
+                    byId[it.id] = it
+                }
             }
             .thenApply {}
 
@@ -37,7 +44,10 @@ class WaypointService(
             .listByOwner(owner)
             .thenAccept { list ->
                 val map = ConcurrentHashMap<String, Waypoint>()
-                list.forEach { map[it.name] = it }
+                list.forEach {
+                    map[it.name] = it
+                    byId[it.id] = it
+                }
                 personalCache[owner] = map
             }
             .thenApply {}
@@ -54,20 +64,24 @@ class WaypointService(
 
     fun findGlobal(name: String): Waypoint? = globalCache[name]
 
-    fun findById(id: WaypointId): Waypoint? {
-        for (map in personalCache.values) {
-            for (wp in map.values) {
-                if (wp.id == id) {
-                    return wp
+    fun findById(id: WaypointId): Waypoint? = byId[id]
+
+    // Loads waypoints shared with a player whose owners have not been online since startup.
+    fun warmShared(ids: Collection<WaypointId>): CompletableFuture<Unit> {
+        val loads =
+            ids.filterNot(byId::containsKey).map { id ->
+                storage.waypoints.findById(id).thenAccept { wp ->
+                    if (wp != null) byId.putIfAbsent(wp.id, wp)
                 }
             }
-        }
-        for (wp in globalCache.values) {
-            if (wp.id == id) {
-                return wp
-            }
-        }
-        return null
+        return CompletableFuture.allOf(*loads.toTypedArray()).thenApply {}
+    }
+
+    // An online owner keeps an empty list; removing it would make their next create fail as not
+    // loaded.
+    fun wipeOwner(owner: UUID) {
+        personalCache[owner]?.clear()
+        byId.values.removeIf { it.owner == owner }
     }
 
     fun createPersonal(
@@ -80,7 +94,8 @@ class WaypointService(
         if (!nameRegex.matches(name)) {
             return done(Outcome.Err(WaypointError.InvalidName(name)))
         }
-        val owned = personalCache.getOrPut(owner) { ConcurrentHashMap() }
+        // No entry means the join warm-up has not finished; creating now would bypass the limit.
+        val owned = personalCache[owner] ?: return done(Outcome.Err(WaypointError.NotLoaded))
         if (owned.containsKey(name)) {
             return done(Outcome.Err(WaypointError.NameTaken(name)))
         }
@@ -98,7 +113,7 @@ class WaypointService(
                 Instant.now(clock),
             )
         owned[name] = wp
-        return persisted(storage.waypoints.save(wp), wp) {
+        return persisted(storage.waypoints.save(wp), null, wp) {
             owned.remove(name, wp)
         }
     }
@@ -125,7 +140,7 @@ class WaypointService(
                 Instant.now(clock),
             )
         globalCache[name] = wp
-        return persisted(storage.waypoints.save(wp), wp) {
+        return persisted(storage.waypoints.save(wp), null, wp) {
             globalCache.remove(name, wp)
         }
     }
@@ -137,14 +152,14 @@ class WaypointService(
         val wp =
             personalCache[owner]?.remove(name)
                 ?: return done(Outcome.Err(WaypointError.NotFound(name)))
-        return persisted(storage.waypoints.delete(wp.id), wp) {
+        return persisted(storage.waypoints.delete(wp.id), wp, null) {
             personalCache[owner]?.putIfAbsent(name, wp)
         }
     }
 
     fun deleteGlobal(name: String): CompletableFuture<Outcome<Waypoint, WaypointError>> {
         val wp = globalCache.remove(name) ?: return done(Outcome.Err(WaypointError.NotFound(name)))
-        return persisted(storage.waypoints.delete(wp.id), wp) {
+        return persisted(storage.waypoints.delete(wp.id), wp, null) {
             globalCache.putIfAbsent(name, wp)
         }
     }
@@ -165,7 +180,7 @@ class WaypointService(
         val renamed = wp.copy(name = new)
         owned.remove(old)
         owned[new] = renamed
-        return persisted(storage.waypoints.save(renamed), renamed) {
+        return persisted(storage.waypoints.save(renamed), wp, renamed) {
             owned.remove(new, renamed)
             owned.putIfAbsent(old, wp)
         }
@@ -185,7 +200,7 @@ class WaypointService(
         val renamed = wp.copy(name = new)
         globalCache.remove(old)
         globalCache[new] = renamed
-        return persisted(storage.waypoints.save(renamed), renamed) {
+        return persisted(storage.waypoints.save(renamed), wp, renamed) {
             globalCache.remove(new, renamed)
             globalCache.putIfAbsent(old, wp)
         }
@@ -194,14 +209,28 @@ class WaypointService(
     // The cache is written first so the minimap updates at once; a failed write undoes it.
     private fun persisted(
         write: CompletableFuture<*>,
-        wp: Waypoint,
+        before: Waypoint?,
+        now: Waypoint?,
         rollback: () -> Unit,
-    ): CompletableFuture<Outcome<Waypoint, WaypointError>> = write.handle { _, e ->
-        if (e == null) {
-            Outcome.Ok(wp)
+    ): CompletableFuture<Outcome<Waypoint, WaypointError>> {
+        val result = requireNotNull(now ?: before)
+        index(result.id, now)
+        return write.handle { _, e ->
+            if (e == null) {
+                Outcome.Ok(result)
+            } else {
+                rollback()
+                index(result.id, before)
+                Outcome.Err(WaypointError.Storage(e))
+            }
+        }
+    }
+
+    private fun index(id: WaypointId, wp: Waypoint?) {
+        if (wp == null) {
+            byId.remove(id)
         } else {
-            rollback()
-            Outcome.Err(WaypointError.Storage(e))
+            byId[id] = wp
         }
     }
 

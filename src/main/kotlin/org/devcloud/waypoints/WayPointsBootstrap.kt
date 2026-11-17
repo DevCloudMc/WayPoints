@@ -80,14 +80,15 @@ class WayPointsBootstrap(val module: WayPointsModule) {
                 config.labelDistanceDecimals,
             )
 
-        module.registerListener(
+        val playerListener =
             PlayerLifecycleListener(
                 waypointService,
                 shareService,
                 visibilityService,
                 teleportService,
+                module.logger,
             )
-        )
+        module.registerListener(playerListener)
         module.registerListener(MinimapLifecycleListener(provider))
 
         // Already-loaded minimaps won't fire MinimapLoadEvent again — register on them now.
@@ -97,10 +98,7 @@ class WayPointsBootstrap(val module: WayPointsModule) {
 
         // Warm profiles + personals for players that are already online (e.g. after /reload).
         for (player in Bukkit.getOnlinePlayers()) {
-            val uuid = player.uniqueId
-            waypointService.warmPlayer(uuid)
-            shareService.warmFor(uuid)
-            visibilityService.warm(uuid)
+            playerListener.warm(player.uniqueId)
         }
 
         val api: WaypointsApi = WaypointsApiImpl(waypointService, shareService)
