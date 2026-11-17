@@ -48,7 +48,7 @@ It is a thin addon. It does one thing — manage map pins — and gets out of th
 |---|---|
 | Server software | Paper 26.3 |
 | Java | 25 |
-| Cartographer2 | 2.15.16+ |
+| Cartographer2 | 2.15.18+ |
 | Optional | PlaceholderAPI |
 
 WayPoints does **not** require Vault. Limits are driven by permission nodes, and teleport cost is intentionally omitted to keep the dependency surface minimal — economies belong in dedicated economy plugins, not minimap addons.

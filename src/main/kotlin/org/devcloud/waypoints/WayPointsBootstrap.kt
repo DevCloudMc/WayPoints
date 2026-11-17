@@ -1,7 +1,6 @@
 package org.devcloud.waypoints
 
 import io.github.bananapuncher714.cartographer.core.Cartographer
-import io.github.bananapuncher714.cartographer.core.module.Module
 import org.bukkit.Bukkit
 import org.bukkit.plugin.ServicePriority
 import org.bukkit.plugin.java.JavaPlugin
@@ -26,7 +25,7 @@ import org.devcloud.waypoints.storage.sqlite.SqliteStorageBackend
 import org.devcloud.waypoints.storage.yaml.YamlStorageBackend
 import org.devcloud.waypoints.util.Async
 
-class WayPointsBootstrap(val module: Module) {
+class WayPointsBootstrap(val module: WayPointsModule) {
     lateinit var config: ConfigSchema
         private set
 
@@ -109,7 +108,7 @@ class WayPointsBootstrap(val module: Module) {
             .register(WaypointsApi::class.java, api, hostPlugin, ServicePriority.Normal)
 
         val tree = CommandTreeBuilder(this).build()
-        module.registerCommandViaReflection(tree)
+        module.register(tree.build())
 
         BStatsBootstrap.start(hostPlugin, config)
 
@@ -160,19 +159,4 @@ class WayPointsBootstrap(val module: Module) {
     companion object {
         const val VERSION = "4.0.0"
     }
-}
-
-/**
- * Module#registerCommand takes a PluginCommand. CommandBase.build() returns PluginCommand via
- * reflection/protected wiring in Cartographer2. This helper isolates that integration point.
- */
-private fun Module.registerCommandViaReflection(
-    cmd: io.github.bananapuncher714.cartographer.core.api.command.CommandBase
-) {
-    val method =
-        Module::class
-            .java
-            .getDeclaredMethod("registerCommand", org.bukkit.command.PluginCommand::class.java)
-    method.isAccessible = true
-    method.invoke(this, cmd.build())
 }

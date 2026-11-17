@@ -1,6 +1,7 @@
 package org.devcloud.waypoints
 
 import io.github.bananapuncher714.cartographer.core.module.Module
+import org.bukkit.command.PluginCommand
 
 class WayPointsModule : Module() {
     private var bootstrap: WayPointsBootstrap? = null
@@ -17,6 +18,9 @@ class WayPointsModule : Module() {
             cartographer.moduleManager.disableModule(this)
         }
     }
+
+    // registerCommand is protected in Module, so the bootstrap goes through this.
+    internal fun register(command: PluginCommand) = registerCommand(command)
 
     override fun onDisable() {
         bootstrap?.stop()

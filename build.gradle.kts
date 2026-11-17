@@ -23,9 +23,11 @@ repositories {
     maven("https://repo.extendedclip.com/content/repositories/placeholderapi/")
 }
 
-// Cartographer2 API is vendored under libs/ because its upstream repo
-// (repo.aaaaahhhhhhh.com) is unreliable and its JitPack coordinates don't resolve.
-val cartographer2 = files("libs/cartographer2_api-2.15.11.jar")
+// Cartographer2 API is vendored under libs/ because its upstream repo (repo.aaaaahhhhhhh.com) is
+// down and it has no GitHub releases.
+// Built with javac from the `api` module of github.com/BananaPuncher714/Cartographer2 at commit
+// 1158310 (plugin version 2.15.18).
+val cartographer2 = files("libs/cartographer2_api-2.15.18.jar")
 
 dependencies {
     compileOnly("io.papermc.paper:paper-api:26.3.build.253-stable")
