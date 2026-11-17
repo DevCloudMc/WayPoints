@@ -3,7 +3,6 @@ package org.devcloud.waypoints.storage.sqlite
 import java.util.*
 import java.util.concurrent.CompletableFuture
 import org.devcloud.waypoints.domain.PlayerProfile
-import org.devcloud.waypoints.domain.VisibilityState
 import org.devcloud.waypoints.storage.PlayerRepository
 
 class SqlitePlayerRepository(private val pool: ConnectionPool) : PlayerRepository {
@@ -11,19 +10,7 @@ class SqlitePlayerRepository(private val pool: ConnectionPool) : PlayerRepositor
         c.prepareStatement("SELECT * FROM player_profiles WHERE uuid = ?").use { ps ->
             ps.setString(1, uuid.toString())
             ps.executeQuery().use { rs ->
-                if (rs.next()) {
-                    PlayerProfile(
-                        uuid = uuid,
-                        visibility =
-                            VisibilityState(
-                                hidePersonal = rs.getInt("hide_personal") == 1,
-                                hideGlobal = rs.getInt("hide_global") == 1,
-                                hideShared = rs.getInt("hide_shared") == 1,
-                            ),
-                    )
-                } else {
-                    PlayerProfile(uuid)
-                }
+                if (rs.next()) SqliteRowMappers.profile(rs) else PlayerProfile(uuid)
             }
         }
     }
@@ -44,30 +31,9 @@ class SqlitePlayerRepository(private val pool: ConnectionPool) : PlayerRepositor
                     )
                     .use { ps ->
                         ps.setString(1, profile.uuid.toString())
-                        ps.setInt(
-                            2,
-                            if (profile.visibility.hidePersonal) {
-                                1
-                            } else {
-                                0
-                            },
-                        )
-                        ps.setInt(
-                            3,
-                            if (profile.visibility.hideGlobal) {
-                                1
-                            } else {
-                                0
-                            },
-                        )
-                        ps.setInt(
-                            4,
-                            if (profile.visibility.hideShared) {
-                                1
-                            } else {
-                                0
-                            },
-                        )
+                        ps.setInt(2, if (profile.visibility.hidePersonal) 1 else 0)
+                        ps.setInt(3, if (profile.visibility.hideGlobal) 1 else 0)
+                        ps.setInt(4, if (profile.visibility.hideShared) 1 else 0)
                         ps.executeUpdate()
                     }
             }

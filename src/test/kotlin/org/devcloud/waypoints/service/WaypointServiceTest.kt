@@ -43,9 +43,11 @@ class WaypointServiceTest {
         if (MockBukkit.isMocked()) MockBukkit.unmock()
     }
 
+    private fun newBackend(prefix: String) =
+        YamlStorageBackend(tmp.resolve("$prefix-${System.nanoTime()}.yml")).also { it.init().get() }
+
     private fun newService(): WaypointService {
-        val backend = YamlStorageBackend(tmp.resolve("svc-${System.nanoTime()}.yml"))
-        backend.init().get()
+        val backend = newBackend("svc")
         val svc =
             WaypointService(
                 backend,
@@ -134,8 +136,7 @@ class WaypointServiceTest {
 
     @Test
     fun `create before the join warm-up is refused`() {
-        val backend = YamlStorageBackend(tmp.resolve("cold-${System.nanoTime()}.yml"))
-        backend.init().get()
+        val backend = newBackend("cold")
         val r =
             WaypointService(backend)
                 .createPersonal(owner, "home", MapCursor.Type.PLAYER_OFF_MAP, loc, 5)
@@ -145,8 +146,7 @@ class WaypointServiceTest {
 
     @Test
     fun `shared waypoint stays resolvable while its owner is offline`() {
-        val backend = YamlStorageBackend(tmp.resolve("shared-${System.nanoTime()}.yml"))
-        backend.init().get()
+        val backend = newBackend("shared")
         val first = WaypointService(backend)
         first.warmPlayer(owner).get()
         val created =

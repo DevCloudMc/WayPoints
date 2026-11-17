@@ -9,7 +9,6 @@ import org.devcloud.waypoints.api.event.WaypointRenameEvent
 import org.devcloud.waypoints.command.CommandSupport
 import org.devcloud.waypoints.command.validator.GlobalWaypointValidator
 import org.devcloud.waypoints.command.validator.WaypointNameValidator
-import org.devcloud.waypoints.util.Outcome
 
 class GlobalRenameCommand(private val ctx: WayPointsBootstrap) {
     fun build(): SubCommand =
@@ -23,31 +22,12 @@ class GlobalRenameCommand(private val ctx: WayPointsBootstrap) {
     private fun execute(sender: CommandSender, args: Array<out String>, p: CommandParameters) {
         val new = p.getLast(String::class.java)
         val old = p.get(String::class.java, p.size() - 2)
-        val wp =
-            ctx.waypointService.findGlobal(old)
-                ?: run {
-                    ctx.messenger.send(
-                        sender,
-                        ctx.lang.message("waypoint-not-found", "name" to old),
-                    )
-                    return
-                }
+        val wp = CommandSupport.findGlobalOrReply(ctx, sender, old) ?: return
         if (CommandSupport.callCancellable(WaypointRenameEvent(sender, wp, new))) {
             return
         }
-        ctx.waypointService.renameGlobal(old, new).thenAccept { res ->
-            ctx.async.runOnMain {
-                when (res) {
-                    is Outcome.Ok ->
-                        ctx.messenger.send(
-                            sender,
-                            ctx.lang.message("global-renamed", "old" to old, "new" to new),
-                        )
-
-                    is Outcome.Err ->
-                        ctx.messenger.send(sender, CommandSupport.renderError(ctx, res.error))
-                }
-            }
+        CommandSupport.reply(ctx, sender, ctx.waypointService.renameGlobal(old, new)) {
+            ctx.lang.message("global-renamed", "old" to old, "new" to new)
         }
     }
 }

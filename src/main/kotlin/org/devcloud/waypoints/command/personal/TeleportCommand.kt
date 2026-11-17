@@ -27,15 +27,7 @@ class TeleportCommand(private val ctx: WayPointsBootstrap) {
             return
         }
         val name = p.getLast(String::class.java)
-        val wp =
-            ctx.waypointService.findOwned(player.uniqueId, name)
-                ?: run {
-                    ctx.messenger.send(
-                        player,
-                        ctx.lang.message("waypoint-not-found", "name" to name),
-                    )
-                    return
-                }
+        val wp = CommandSupport.findOwnedOrReply(ctx, player, name) ?: return
         val bypass = player.hasPermission("waypoints.tp.cooldown.bypass")
         val remaining = ctx.teleportService.remainingCooldown(player.uniqueId, bypass)
         if (remaining > Duration.ZERO) {

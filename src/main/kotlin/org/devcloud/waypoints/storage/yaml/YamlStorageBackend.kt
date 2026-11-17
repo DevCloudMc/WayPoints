@@ -39,16 +39,6 @@ class YamlStorageBackend(private val file: Path) : StorageBackend {
                 cache.waypoints.firstOrNull { it.id == id }
             }
 
-            override fun findByOwnerAndName(owner: UUID, name: String) = submit {
-                cache.waypoints.firstOrNull {
-                    it.owner == owner && it.scope == WaypointScope.PERSONAL && it.name == name
-                }
-            }
-
-            override fun findGlobalByName(name: String) = submit {
-                cache.waypoints.firstOrNull { it.scope == WaypointScope.GLOBAL && it.name == name }
-            }
-
             override fun listByOwner(owner: UUID) = submit {
                 cache.waypoints.filter { it.owner == owner }
             }
@@ -127,10 +117,6 @@ class YamlStorageBackend(private val file: Path) : StorageBackend {
                 cache.shares.filter { it.sharedWith == target }
             }
 
-            override fun listSharesFor(id: WaypointId) = submit {
-                cache.shares.filter { it.waypointId == id }
-            }
-
             override fun removeAllByOwner(owner: UUID) = submit {
                 val ownedIds = cache.waypoints.filter { it.owner == owner }.map { it.id }.toSet()
                 val toRemove = cache.shares.filter { it.waypointId in ownedIds }
@@ -191,11 +177,13 @@ class YamlStorageBackend(private val file: Path) : StorageBackend {
         return cf
     }
 
+    @Suppress("UNCHECKED_CAST")
+    private fun YamlConfiguration.rows(key: String) = getMapList(key) as List<Map<String, Any?>>
+
     private fun load(): StorageSnapshot {
         val cfg = YamlConfiguration.loadConfiguration(file.toFile())
         val wps =
-            cfg.getMapList("waypoints").map { row ->
-                @Suppress("UNCHECKED_CAST") val m = row as Map<String, Any?>
+            cfg.rows("waypoints").map { m ->
                 Waypoint(
                     id = WaypointId.parse(m["id"] as String),
                     owner = (m["owner"] as String?)?.let(UUID::fromString),
@@ -215,8 +203,7 @@ class YamlStorageBackend(private val file: Path) : StorageBackend {
                 )
             }
         val sh =
-            cfg.getMapList("shares").map { row ->
-                @Suppress("UNCHECKED_CAST") val m = row as Map<String, Any?>
+            cfg.rows("shares").map { m ->
                 WaypointShare(
                     WaypointId.parse(m["waypointId"] as String),
                     UUID.fromString(m["sharedWith"] as String),
@@ -224,8 +211,7 @@ class YamlStorageBackend(private val file: Path) : StorageBackend {
                 )
             }
         val pr =
-            cfg.getMapList("profiles").map { row ->
-                @Suppress("UNCHECKED_CAST") val m = row as Map<String, Any?>
+            cfg.rows("profiles").map { m ->
                 PlayerProfile(
                     uuid = UUID.fromString(m["uuid"] as String),
                     visibility =

@@ -21,38 +21,6 @@ class SqliteWaypointRepository(private val pool: ConnectionPool) : WaypointRepos
         }
     }
 
-    override fun findByOwnerAndName(owner: UUID, name: String): CompletableFuture<Waypoint?> =
-        pool.submit { c ->
-            c.prepareStatement(
-                    "SELECT * FROM waypoints WHERE owner = ? AND scope = 'PERSONAL' AND name = ?"
-                )
-                .use { ps ->
-                    ps.setString(1, owner.toString())
-                    ps.setString(2, name)
-                    ps.executeQuery().use { rs ->
-                        if (rs.next()) {
-                            SqliteRowMappers.waypoint(rs)
-                        } else {
-                            null
-                        }
-                    }
-                }
-        }
-
-    override fun findGlobalByName(name: String): CompletableFuture<Waypoint?> = pool.submit { c ->
-        c.prepareStatement("SELECT * FROM waypoints WHERE scope = 'GLOBAL' AND name = ?").use { ps
-            ->
-            ps.setString(1, name)
-            ps.executeQuery().use { rs ->
-                if (rs.next()) {
-                    SqliteRowMappers.waypoint(rs)
-                } else {
-                    null
-                }
-            }
-        }
-    }
-
     override fun listByOwner(owner: UUID): CompletableFuture<List<Waypoint>> = pool.submit { c ->
         c.prepareStatement("SELECT * FROM waypoints WHERE owner = ?").use { ps ->
             ps.setString(1, owner.toString())

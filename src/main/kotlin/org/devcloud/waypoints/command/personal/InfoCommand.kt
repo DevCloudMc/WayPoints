@@ -7,6 +7,7 @@ import kotlin.math.roundToInt
 import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
 import org.devcloud.waypoints.WayPointsBootstrap
+import org.devcloud.waypoints.command.CommandSupport
 import org.devcloud.waypoints.command.validator.OwnedWaypointValidator
 
 class InfoCommand(private val ctx: WayPointsBootstrap) {
@@ -19,15 +20,7 @@ class InfoCommand(private val ctx: WayPointsBootstrap) {
     private fun execute(sender: CommandSender, args: Array<out String>, p: CommandParameters) {
         val player = sender as Player
         val name = p.getLast(String::class.java)
-        val wp =
-            ctx.waypointService.findOwned(player.uniqueId, name)
-                ?: run {
-                    ctx.messenger.send(
-                        player,
-                        ctx.lang.message("waypoint-not-found", "name" to name),
-                    )
-                    return
-                }
+        val wp = CommandSupport.findOwnedOrReply(ctx, player, name) ?: return
         ctx.messenger.send(
             player,
             ctx.lang.message(
