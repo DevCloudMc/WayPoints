@@ -1,6 +1,5 @@
 package org.devcloud.waypoints.service
 
-import be.seeseemelk.mockbukkit.MockBukkit
 import java.nio.file.Path
 import java.time.Clock
 import java.time.Instant
@@ -20,6 +19,7 @@ import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.io.TempDir
+import org.mockbukkit.mockbukkit.MockBukkit
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class WaypointServiceTest {

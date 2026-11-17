@@ -46,8 +46,8 @@ It is a thin addon. It does one thing — manage map pins — and gets out of th
 
 | | |
 |---|---|
-| Server software | Paper 1.21.1+ |
-| Java | 21 |
+| Server software | Paper 26.3 |
+| Java | 25 |
 | Cartographer2 | 2.15.16+ |
 | Optional | PlaceholderAPI |
 
@@ -179,7 +179,7 @@ Add the dependency (artifact will be published to the project's Maven repository
 
 ```kotlin
 dependencies {
-    compileOnly("org.devcloud:waypoints:3.0.0")
+    compileOnly("org.devcloud:waypoints:4.0.0")
 }
 ```
 

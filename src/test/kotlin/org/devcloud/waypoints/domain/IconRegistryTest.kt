@@ -1,6 +1,5 @@
 package org.devcloud.waypoints.domain
 
-import be.seeseemelk.mockbukkit.MockBukkit
 import kotlin.test.assertEquals
 import kotlin.test.assertNull
 import org.bukkit.map.MapCursor
@@ -8,6 +7,7 @@ import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
+import org.mockbukkit.mockbukkit.MockBukkit
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class IconRegistryTest {

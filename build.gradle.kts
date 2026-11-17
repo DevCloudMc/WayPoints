@@ -3,7 +3,7 @@ import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 plugins {
     kotlin("jvm") version "2.4.21"
     id("com.gradleup.shadow") version "9.6.1"
-    id("io.gitlab.arturbosch.detekt") version "1.23.8"
+    id("dev.detekt") version "2.0.0-alpha.6"
     id("com.diffplug.spotless") version "8.11.0"
     id("org.jetbrains.dokka") version "2.3.0"
     `maven-publish`
@@ -11,11 +11,11 @@ plugins {
 
 group = "org.devcloud"
 
-version = "3.0.0"
+version = "4.0.0"
 
-java { toolchain.languageVersion.set(JavaLanguageVersion.of(21)) }
+java { toolchain.languageVersion.set(JavaLanguageVersion.of(25)) }
 
-kotlin { jvmToolchain(21) }
+kotlin { jvmToolchain(25) }
 
 repositories {
     mavenCentral()
@@ -28,18 +28,18 @@ repositories {
 val cartographer2 = files("libs/cartographer2_api-2.15.11.jar")
 
 dependencies {
-    compileOnly("io.papermc.paper:paper-api:1.21.1-R0.1-SNAPSHOT")
+    compileOnly("io.papermc.paper:paper-api:26.3.build.253-stable")
     compileOnly(cartographer2)
-    compileOnly("me.clip:placeholderapi:2.11.6")
+    compileOnly("me.clip:placeholderapi:2.12.3")
 
-    implementation("org.xerial:sqlite-jdbc:3.46.1.0")
-    implementation("org.bstats:bstats-bukkit:3.0.2")
+    implementation("org.xerial:sqlite-jdbc:3.54.1.0")
+    implementation("org.bstats:bstats-bukkit:3.2.1")
 
     testImplementation(kotlin("test"))
-    testImplementation("org.junit.jupiter:junit-jupiter:5.11.0")
-    testImplementation("io.mockk:mockk:1.13.12")
-    testImplementation("com.github.seeseemelk:MockBukkit-v1.21:3.133.2")
-    testImplementation("io.papermc.paper:paper-api:1.21.1-R0.1-SNAPSHOT")
+    testImplementation("org.junit.jupiter:junit-jupiter:6.1.3")
+    testImplementation("io.mockk:mockk:1.14.12")
+    testImplementation("org.mockbukkit.mockbukkit:mockbukkit-v26.3:4.120.0")
+    testImplementation("io.papermc.paper:paper-api:26.3.build.200-stable")
     testImplementation(cartographer2)
 }
 
@@ -72,7 +72,7 @@ dokka {
         includes.from("docs/module.md")
     }
     dokkaSourceSets.configureEach {
-        jdkVersion.set(21)
+        jdkVersion.set(25)
         reportUndocumented.set(false)
         skipEmptyPackages.set(true)
         // Document only the intentionally-public surface.
@@ -82,7 +82,7 @@ dokka {
             )
             suppress.set(true)
         }
-        externalDocumentationLinks.register("paper") { url("https://jd.papermc.io/paper/1.21.1/") }
+        externalDocumentationLinks.register("paper") { url("https://jd.papermc.io/paper/26.3/") }
     }
 }
 
