@@ -23,6 +23,17 @@ class PermissionLimitTest {
     }
 
     @Test
+    fun `default applies only when no permission matched`() {
+        val none = mockk<Permissible>()
+        every { none.effectivePermissions } returns mutableSetOf()
+        assertEquals(10, PermissionLimit.compute(none, "waypoints.limit", 10))
+        val three = mockk<Permissible>()
+        every { three.effectivePermissions } returns
+            mutableSetOf(permInfo("waypoints.limit.3", true))
+        assertEquals(3, PermissionLimit.compute(three, "waypoints.limit", 10))
+    }
+
+    @Test
     fun `returns highest matching permission`() {
         val p = mockk<Permissible>()
         every { p.effectivePermissions } returns

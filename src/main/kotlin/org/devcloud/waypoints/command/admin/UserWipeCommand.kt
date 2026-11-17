@@ -7,6 +7,7 @@ import io.github.bananapuncher714.cartographer.core.api.command.validator.sender
 import org.bukkit.OfflinePlayer
 import org.bukkit.command.CommandSender
 import org.devcloud.waypoints.WayPointsBootstrap
+import org.devcloud.waypoints.command.CommandSupport
 
 class UserWipeCommand(private val ctx: WayPointsBootstrap) {
     fun build(): SubCommand =
@@ -16,7 +17,7 @@ class UserWipeCommand(private val ctx: WayPointsBootstrap) {
 
     private fun execute(sender: CommandSender, args: Array<out String>, p: CommandParameters) {
         val target = p.getLast(OfflinePlayer::class.java)
-        ctx.waypointService.forgetPlayer(target.uniqueId)
+        ctx.waypointService.wipeOwner(target.uniqueId)
         ctx.storage.shares
             .removeAllByOwner(target.uniqueId)
             .thenCompose { ctx.storage.waypoints.deleteAllByOwner(target.uniqueId) }
@@ -32,5 +33,6 @@ class UserWipeCommand(private val ctx: WayPointsBootstrap) {
                     )
                 }
             }
+            .exceptionally { CommandSupport.reportFailure(ctx, sender, it) }
     }
 }

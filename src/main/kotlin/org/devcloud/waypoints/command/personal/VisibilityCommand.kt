@@ -6,6 +6,7 @@ import io.github.bananapuncher714.cartographer.core.api.command.validator.sender
 import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
 import org.devcloud.waypoints.WayPointsBootstrap
+import org.devcloud.waypoints.command.CommandSupport
 import org.devcloud.waypoints.command.validator.ScopeValidator
 import org.devcloud.waypoints.command.validator.ShowHideValidator
 import org.devcloud.waypoints.command.validator.VisibilityScope
@@ -49,22 +50,25 @@ class VisibilityCommand(private val ctx: WayPointsBootstrap) {
                 VisibilityScope.SHARED -> cur.copy(hideShared = hide)
                 VisibilityScope.ALL -> VisibilityState(hide, hide, hide)
             }
-        ctx.visibilityService.set(player.uniqueId, next).thenAccept {
-            ctx.async.runOnMain {
-                ctx.messenger.send(
-                    player,
-                    ctx.lang.message(
-                        "visibility-set",
-                        "scope" to scope.name.lowercase(),
-                        "state" to
-                            if (hide) {
-                                "hidden"
-                            } else {
-                                "visible"
-                            },
-                    ),
-                )
+        ctx.visibilityService
+            .set(player.uniqueId, next)
+            .thenAccept {
+                ctx.async.runOnMain {
+                    ctx.messenger.send(
+                        player,
+                        ctx.lang.message(
+                            "visibility-set",
+                            "scope" to scope.name.lowercase(),
+                            "state" to
+                                if (hide) {
+                                    "hidden"
+                                } else {
+                                    "visible"
+                                },
+                        ),
+                    )
+                }
             }
-        }
+            .exceptionally { CommandSupport.reportFailure(ctx, player, it) }
     }
 }

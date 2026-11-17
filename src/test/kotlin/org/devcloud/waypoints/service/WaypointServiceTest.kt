@@ -1,11 +1,14 @@
 package org.devcloud.waypoints.service
 
-import be.seeseemelk.mockbukkit.MockBukkit
+import io.mockk.every
+import io.mockk.mockk
+import java.io.IOException
 import java.nio.file.Path
 import java.time.Clock
 import java.time.Instant
 import java.time.ZoneOffset
 import java.util.UUID
+import java.util.concurrent.CompletableFuture
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 import kotlin.test.assertNull
@@ -13,6 +16,7 @@ import kotlin.test.assertTrue
 import org.bukkit.map.MapCursor
 import org.devcloud.waypoints.domain.WaypointLocation
 import org.devcloud.waypoints.domain.error.WaypointError
+import org.devcloud.waypoints.storage.StorageBackend
 import org.devcloud.waypoints.storage.yaml.YamlStorageBackend
 import org.devcloud.waypoints.util.Outcome
 import org.junit.jupiter.api.AfterAll
@@ -20,6 +24,7 @@ import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.io.TempDir
+import org.mockbukkit.mockbukkit.MockBukkit
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class WaypointServiceTest {
@@ -111,5 +116,48 @@ class WaypointServiceTest {
         assertNotNull(svc.findGlobal("spawn"))
         svc.deleteGlobal("spawn").get()
         assertNull(svc.findGlobal("spawn"))
+    }
+
+    @Test
+    fun `failed write rolls the cache back and reports a storage error`() {
+        val backend = mockk<StorageBackend>()
+        every { backend.waypoints.save(any()) } returns
+            CompletableFuture.failedFuture(IOException("disk full"))
+        every { backend.waypoints.listByOwner(owner) } returns
+            CompletableFuture.completedFuture(emptyList())
+        val svc = WaypointService(backend)
+        svc.warmPlayer(owner).get()
+        val r = svc.createPersonal(owner, "home", MapCursor.Type.PLAYER_OFF_MAP, loc, 5).get()
+        assertTrue((r as Outcome.Err).error is WaypointError.Storage)
+        assertNull(svc.findOwned(owner, "home"))
+    }
+
+    @Test
+    fun `create before the join warm-up is refused`() {
+        val backend = YamlStorageBackend(tmp.resolve("cold-${System.nanoTime()}.yml"))
+        backend.init().get()
+        val r =
+            WaypointService(backend)
+                .createPersonal(owner, "home", MapCursor.Type.PLAYER_OFF_MAP, loc, 5)
+                .get()
+        assertEquals(WaypointError.NotLoaded, (r as Outcome.Err).error)
+    }
+
+    @Test
+    fun `shared waypoint stays resolvable while its owner is offline`() {
+        val backend = YamlStorageBackend(tmp.resolve("shared-${System.nanoTime()}.yml"))
+        backend.init().get()
+        val first = WaypointService(backend)
+        first.warmPlayer(owner).get()
+        val created =
+            first.createPersonal(owner, "home", MapCursor.Type.PLAYER_OFF_MAP, loc, 5).get()
+        val id = (created as Outcome.Ok).value.id
+        first.forgetPlayer(owner)
+        assertNotNull(first.findById(id), "owner logged out")
+
+        val afterRestart = WaypointService(backend)
+        assertNull(afterRestart.findById(id))
+        afterRestart.warmShared(listOf(id)).get()
+        assertNotNull(afterRestart.findById(id), "owner never online since restart")
     }
 }

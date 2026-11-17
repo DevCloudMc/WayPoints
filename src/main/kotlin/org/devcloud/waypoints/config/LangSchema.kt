@@ -10,7 +10,8 @@ class LangSchema
 private constructor(private val cfg: YamlConfiguration, private val mm: MiniMessage) {
     fun message(key: String, vararg args: Pair<String, String>): Component {
         val raw = cfg.getString(key) ?: return Component.text("missing-lang-key:$key")
-        val resolvers = args.map { (k, v) -> Placeholder.parsed(k, v) }.toTypedArray<TagResolver>()
+        val resolvers =
+            args.map { (k, v) -> Placeholder.unparsed(k, v) }.toTypedArray<TagResolver>()
         return mm.deserialize(raw, *resolvers)
     }
 

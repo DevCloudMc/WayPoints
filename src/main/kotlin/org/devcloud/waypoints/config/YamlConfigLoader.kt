@@ -11,6 +11,10 @@ class YamlConfigLoader(private val dataFolder: File) {
             dataFolder.mkdirs()
             defaults().use { input -> file.outputStream().use { out -> input.copyTo(out) } }
         }
-        return YamlConfiguration.loadConfiguration(file)
+        val cfg = YamlConfiguration.loadConfiguration(file)
+        defaults().use { input ->
+            cfg.setDefaults(YamlConfiguration.loadConfiguration(input.reader()))
+        }
+        return cfg
     }
 }

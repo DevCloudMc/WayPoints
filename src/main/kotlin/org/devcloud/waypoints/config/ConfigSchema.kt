@@ -12,6 +12,7 @@ data class ConfigSchema(
     val yamlFile: String,
     val hideLabelWithinBlocks: Double,
     val labelDistanceDecimals: Int,
+    val defaultLimit: Int,
     val teleportEnabled: Boolean,
     val teleportCooldown: Duration,
     val teleportWarmup: Duration,
@@ -20,14 +21,20 @@ data class ConfigSchema(
     val metricsEnabled: Boolean,
 ) {
     companion object {
+        private fun parseStorageType(raw: String): StorageType =
+            StorageType.entries.firstOrNull { it.name.equals(raw, ignoreCase = true) }
+                ?: throw IllegalArgumentException(
+                    "Invalid storage.type '$raw', allowed: sqlite, yaml"
+                )
+
         fun load(cfg: YamlConfiguration): ConfigSchema =
             ConfigSchema(
-                storageType =
-                    StorageType.valueOf(cfg.getString("storage.type", "sqlite")!!.uppercase()),
+                storageType = parseStorageType(cfg.getString("storage.type", "sqlite")!!),
                 sqliteFile = cfg.getString("storage.sqlite.file", "database.db")!!,
                 yamlFile = cfg.getString("storage.yaml.file", "waypoints.yml")!!,
                 hideLabelWithinBlocks = cfg.getDouble("display.hide-label-within-blocks", 5.0),
                 labelDistanceDecimals = cfg.getInt("display.label-distance-decimals", 0),
+                defaultLimit = cfg.getInt("limits.default", 10),
                 teleportEnabled = cfg.getBoolean("teleport.enabled", true),
                 teleportCooldown =
                     Duration.ofSeconds(cfg.getInt("teleport.cooldown-seconds", 10).toLong()),

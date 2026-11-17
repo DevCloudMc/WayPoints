@@ -43,21 +43,24 @@ class UnshareCommand(private val ctx: WayPointsBootstrap) {
         if (CommandSupport.callCancellable(WaypointUnshareEvent(player, wp, target.uniqueId))) {
             return
         }
-        ctx.shareService.unshare(wp.id, target.uniqueId).thenAccept { removed ->
-            ctx.async.runOnMain {
-                if (removed) {
-                    ctx.messenger.send(
-                        player,
-                        ctx.lang.message(
-                            "share-removed",
-                            "name" to wp.name,
-                            "target" to (target.name ?: "?"),
-                        ),
-                    )
-                } else {
-                    ctx.messenger.send(player, ctx.lang.message("share-not-found"))
+        ctx.shareService
+            .unshare(wp.id, target.uniqueId)
+            .thenAccept { removed ->
+                ctx.async.runOnMain {
+                    if (removed) {
+                        ctx.messenger.send(
+                            player,
+                            ctx.lang.message(
+                                "share-removed",
+                                "name" to wp.name,
+                                "target" to (target.name ?: "?"),
+                            ),
+                        )
+                    } else {
+                        ctx.messenger.send(player, ctx.lang.message("share-not-found"))
+                    }
                 }
             }
-        }
+            .exceptionally { CommandSupport.reportFailure(ctx, player, it) }
     }
 }

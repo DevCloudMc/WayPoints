@@ -8,6 +8,6 @@ import org.junit.jupiter.api.io.TempDir
 class YamlStorageBackendTest : RepositoryContractTest() {
     @TempDir lateinit var tmp: Path
 
-    override fun newBackend(): StorageBackend =
-        YamlStorageBackend(tmp.resolve("test-${System.nanoTime()}.yml"))
+    override fun newBackend(name: String): StorageBackend =
+        YamlStorageBackend(tmp.resolve("$name.yml"))
 }

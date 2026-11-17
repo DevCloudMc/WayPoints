@@ -1,6 +1,8 @@
 package org.devcloud.waypoints
 
 import io.github.bananapuncher714.cartographer.core.module.Module
+import org.bukkit.command.PluginCommand
+import org.bukkit.scheduler.BukkitTask
 
 class WayPointsModule : Module() {
     private var bootstrap: WayPointsBootstrap? = null
@@ -10,13 +12,18 @@ class WayPointsModule : Module() {
         bootstrap = b
         try {
             b.start()
-            logger.info("WayPoints 3.0.0 enabled.")
+            logger.info("WayPoints $version enabled.")
         } catch (e: Exception) {
             logger.severe("Failed to start WayPoints: ${e.message}")
             e.printStackTrace()
             cartographer.moduleManager.disableModule(this)
         }
     }
+
+    // registerCommand is protected in Module, so the bootstrap goes through this.
+    internal fun register(command: PluginCommand) = registerCommand(command)
+
+    internal fun later(delayTicks: Long, task: Runnable): BukkitTask = runTask(task, delayTicks)
 
     override fun onDisable() {
         bootstrap?.stop()

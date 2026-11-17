@@ -5,12 +5,12 @@ import java.sql.Connection
 import java.sql.DriverManager
 import java.util.concurrent.CompletableFuture
 import java.util.concurrent.Executors
+import java.util.concurrent.TimeUnit
 
 class ConnectionPool(private val dbPath: Path) : AutoCloseable {
-    private val executor =
-        Executors.newSingleThreadExecutor { r ->
-            Thread(r, "WayPoints-SQLite").apply { isDaemon = true }
-        }
+    private val executor = Executors.newSingleThreadExecutor { r ->
+        Thread(r, "WayPoints-SQLite").apply { isDaemon = true }
+    }
 
     private val connection: Connection by lazy {
         Class.forName("org.sqlite.JDBC")
@@ -39,5 +39,7 @@ class ConnectionPool(private val dbPath: Path) : AutoCloseable {
     override fun close() {
         executor.submit { runCatching { connection.close() } }
         executor.shutdown()
+        // Queued writes must reach disk before the server stops.
+        executor.awaitTermination(10, TimeUnit.SECONDS)
     }
 }

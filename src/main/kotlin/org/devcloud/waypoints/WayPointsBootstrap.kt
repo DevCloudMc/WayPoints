@@ -1,7 +1,6 @@
 package org.devcloud.waypoints
 
 import io.github.bananapuncher714.cartographer.core.Cartographer
-import io.github.bananapuncher714.cartographer.core.module.Module
 import org.bukkit.Bukkit
 import org.bukkit.plugin.ServicePriority
 import org.bukkit.plugin.java.JavaPlugin
@@ -14,6 +13,7 @@ import org.devcloud.waypoints.integration.bstats.BStatsBootstrap
 import org.devcloud.waypoints.integration.papi.WaypointsExpansion
 import org.devcloud.waypoints.listener.MinimapLifecycleListener
 import org.devcloud.waypoints.listener.PlayerLifecycleListener
+import org.devcloud.waypoints.listener.TeleportWarmupListener
 import org.devcloud.waypoints.messaging.Messenger
 import org.devcloud.waypoints.provider.WaypointWorldCursorProvider
 import org.devcloud.waypoints.service.ShareService
@@ -26,7 +26,7 @@ import org.devcloud.waypoints.storage.sqlite.SqliteStorageBackend
 import org.devcloud.waypoints.storage.yaml.YamlStorageBackend
 import org.devcloud.waypoints.util.Async
 
-class WayPointsBootstrap(val module: Module) {
+class WayPointsBootstrap(val module: WayPointsModule) {
     lateinit var config: ConfigSchema
         private set
 
@@ -57,6 +57,12 @@ class WayPointsBootstrap(val module: Module) {
     lateinit var async: Async
         private set
 
+    lateinit var teleportWarmups: TeleportWarmupListener
+        private set
+
+    private lateinit var api: WaypointsApi
+    private var expansion: WaypointsExpansion? = null
+
     private val hostPlugin: JavaPlugin by lazy { Cartographer.getInstance() }
 
     fun start() {
@@ -68,7 +74,7 @@ class WayPointsBootstrap(val module: Module) {
         waypointService = WaypointService(storage)
         shareService = ShareService(storage)
         visibilityService = VisibilityService(storage)
-        teleportService = TeleportService(config.teleportCooldown)
+        teleportService = TeleportService({ config.teleportCooldown })
 
         waypointService.warmGlobals().get()
 
@@ -77,19 +83,24 @@ class WayPointsBootstrap(val module: Module) {
                 waypointService,
                 shareService,
                 visibilityService,
-                config.hideLabelWithinBlocks,
-                config.labelDistanceDecimals,
-            )
+            ) {
+                config
+            }
 
-        module.registerListener(
+        val playerListener =
             PlayerLifecycleListener(
                 waypointService,
                 shareService,
                 visibilityService,
-                teleportService,
+                module.logger,
             )
-        )
+        module.registerListener(playerListener)
         module.registerListener(MinimapLifecycleListener(provider))
+        teleportWarmups =
+            TeleportWarmupListener(module::later, { config.teleportCancelOnMove }) {
+                messenger.send(it, lang.message("teleport-cancelled"))
+            }
+        module.registerListener(teleportWarmups)
 
         // Already-loaded minimaps won't fire MinimapLoadEvent again — register on them now.
         Cartographer.getInstance().mapManager.minimaps.values.forEach {
@@ -98,36 +109,40 @@ class WayPointsBootstrap(val module: Module) {
 
         // Warm profiles + personals for players that are already online (e.g. after /reload).
         for (player in Bukkit.getOnlinePlayers()) {
-            val uuid = player.uniqueId
-            waypointService.warmPlayer(uuid)
-            shareService.warmFor(uuid)
-            visibilityService.warm(uuid)
+            playerListener.warm(player.uniqueId)
         }
 
-        val api: WaypointsApi = WaypointsApiImpl(waypointService, shareService)
+        api = WaypointsApiImpl(waypointService, shareService)
         Bukkit.getServicesManager()
             .register(WaypointsApi::class.java, api, hostPlugin, ServicePriority.Normal)
 
         val tree = CommandTreeBuilder(this).build()
-        module.registerCommandViaReflection(tree)
+        module.register(tree.build())
 
         BStatsBootstrap.start(hostPlugin, config)
 
         if (Bukkit.getPluginManager().isPluginEnabled("PlaceholderAPI")) {
-            WaypointsExpansion(waypointService, VERSION).register()
+            expansion =
+                WaypointsExpansion(waypointService, module.version) { config.defaultLimit }
+                    .also { it.register() }
         }
     }
 
     fun stop() {
+        // Cartographer2 drops listeners and commands itself; these three it does not know about.
+        runCatching {
+            Cartographer.getInstance().mapManager.minimaps.values.forEach {
+                it.unregisterProvider(provider)
+            }
+        }
+        runCatching { Bukkit.getServicesManager().unregister(WaypointsApi::class.java, api) }
+        runCatching { expansion?.unregister() }
         runCatching { storage.close() }
     }
 
+    // storage.* is read once at startup; everything else is read on use.
     fun reload() {
         loadConfigs()
-        // Live-updating provider constants requires replacing the provider; caches remain valid.
-        // For 2.0 we only reload lang + config values that are read on each call (teleport cooldown
-        // from TeleportService
-        // is captured at construction, so a full reload requires a restart). Document this in help.
     }
 
     private fun loadConfigs() {
@@ -156,23 +171,4 @@ class WayPointsBootstrap(val module: Module) {
             StorageType.YAML -> YamlStorageBackend(dataFolder.resolve(cfg.yamlFile))
         }
     }
-
-    companion object {
-        const val VERSION = "3.0.0"
-    }
-}
-
-/**
- * Module#registerCommand takes a PluginCommand. CommandBase.build() returns PluginCommand via
- * reflection/protected wiring in Cartographer2. This helper isolates that integration point.
- */
-private fun Module.registerCommandViaReflection(
-    cmd: io.github.bananapuncher714.cartographer.core.api.command.CommandBase
-) {
-    val method =
-        Module::class
-            .java
-            .getDeclaredMethod("registerCommand", org.bukkit.command.PluginCommand::class.java)
-    method.isAccessible = true
-    method.invoke(this, cmd.build())
 }
