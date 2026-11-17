@@ -30,9 +30,6 @@ object SqliteSchema {
                 "CREATE UNIQUE INDEX IF NOT EXISTS idx_waypoints_global_name ON waypoints(name) WHERE scope = 'GLOBAL'"
             )
             st.executeUpdate(
-                "CREATE UNIQUE INDEX IF NOT EXISTS idx_waypoints_global_name ON waypoints(name) WHERE scope = 'GLOBAL'"
-            )
-            st.executeUpdate(
                 """
                 CREATE TABLE IF NOT EXISTS waypoint_shares (
                     waypoint_id TEXT NOT NULL,

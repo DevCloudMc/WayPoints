@@ -64,11 +64,7 @@ class CreateCommand(private val ctx: WayPointsBootstrap) {
     }
 
     private fun runCreate(player: Player, name: String, icon: MapCursor.Type) {
-        val limit =
-            PermissionLimit.effective(
-                PermissionLimit.compute(player, "waypoints.limit"),
-                ctx.config.defaultLimit,
-            )
+        val limit = PermissionLimit.compute(player, "waypoints.limit", ctx.config.defaultLimit)
         if (limit <= 0) {
             ctx.messenger.send(player, ctx.lang.message("limit-reached", "max" to "0"))
             return

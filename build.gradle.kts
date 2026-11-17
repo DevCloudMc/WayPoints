@@ -41,6 +41,7 @@ dependencies {
     testImplementation("org.junit.jupiter:junit-jupiter:6.1.3")
     testImplementation("io.mockk:mockk:1.14.12")
     testImplementation("org.mockbukkit.mockbukkit:mockbukkit-v26.3:4.120.0")
+    // MockBukkit 4.120.0 is built against build 200 and its registry mocks fail on newer builds.
     testImplementation("io.papermc.paper:paper-api:26.3.build.200-stable")
     testImplementation(cartographer2)
 }

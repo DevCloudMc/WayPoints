@@ -45,7 +45,7 @@ abstract class RepositoryContractTest {
             createdAt = Instant.parse("2026-01-01T00:00:00Z"),
         )
 
-    private fun global(name: String) =
+    protected fun global(name: String) =
         Waypoint(
             id = WaypointId.random(),
             owner = null,

@@ -24,12 +24,7 @@ class WaypointsExpansion(
         val online = player?.player ?: return null
         return when (params.lowercase()) {
             "count" -> waypointService.listOwned(online.uniqueId).size.toString()
-            "max" ->
-                PermissionLimit.effective(
-                        PermissionLimit.compute(online, "waypoints.limit"),
-                        defaultLimit(),
-                    )
-                    .toString()
+            "max" -> PermissionLimit.compute(online, "waypoints.limit", defaultLimit()).toString()
             "nearest_name" -> nearest(online)?.first.orEmpty()
             "nearest_distance" -> nearest(online)?.second?.let { "%.1f".format(it) }.orEmpty()
             else -> null
