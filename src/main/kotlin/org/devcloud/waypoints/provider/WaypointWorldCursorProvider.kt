@@ -7,7 +7,6 @@ import io.github.bananapuncher714.cartographer.core.renderer.PlayerSetting
 import org.bukkit.Location
 import org.bukkit.entity.Player
 import org.devcloud.waypoints.config.ConfigSchema
-import org.devcloud.waypoints.domain.VisibilityState
 import org.devcloud.waypoints.domain.Waypoint
 import org.devcloud.waypoints.service.ShareService
 import org.devcloud.waypoints.service.VisibilityService
@@ -31,16 +30,16 @@ class WaypointWorldCursorProvider(
 
         if (!visibility.hidePersonal) {
             for (wp in waypointService.listOwned(player.uniqueId)) {
-                addCursor(out, wp, playerLoc, visibility)
+                addCursor(out, wp, playerLoc)
             }
         }
         if (!visibility.hideGlobal) {
-            for (wp in waypointService.listGlobals()) addCursor(out, wp, playerLoc, visibility)
+            for (wp in waypointService.listGlobals()) addCursor(out, wp, playerLoc)
         }
         if (!visibility.hideShared) {
             for (id in shareService.listFor(player.uniqueId)) {
                 val wp = waypointService.findById(id) ?: continue
-                addCursor(out, wp, playerLoc, visibility)
+                addCursor(out, wp, playerLoc)
             }
         }
         return out
@@ -50,7 +49,6 @@ class WaypointWorldCursorProvider(
         out: MutableList<WorldCursor>,
         wp: Waypoint,
         playerLoc: Location,
-        @Suppress("UNUSED_PARAMETER") visibility: VisibilityState,
     ) {
         val resolved = wp.location.resolve() ?: return
         val distance = WaypointDistanceService.horizontal(playerLoc, wp.location)

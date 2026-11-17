@@ -34,9 +34,10 @@ dependencies {
     compileOnly(cartographer2)
     compileOnly("me.clip:placeholderapi:2.12.3")
 
-    implementation("org.xerial:sqlite-jdbc:3.54.1.0")
     implementation("org.bstats:bstats-bukkit:3.2.1")
 
+    // Paper ships sqlite-jdbc; a shaded and relocated copy cannot load its native library.
+    testRuntimeOnly("org.xerial:sqlite-jdbc:3.54.1.0")
     testImplementation(kotlin("test"))
     testImplementation("org.junit.jupiter:junit-jupiter:6.1.3")
     testImplementation("io.mockk:mockk:1.14.12")
@@ -57,7 +58,6 @@ tasks.test {
 
 tasks.named<ShadowJar>("shadowJar") {
     archiveClassifier.set("")
-    relocate("org.sqlite", "org.devcloud.waypoints.shadow.sqlite")
     relocate("org.bstats", "org.devcloud.waypoints.shadow.bstats")
 }
 

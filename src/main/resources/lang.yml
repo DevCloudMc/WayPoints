@@ -3,7 +3,6 @@ prefix: "<gray>[<gold>WayPoints</gold>]</gray>"
 # Generic
 still-loading: "<yellow>Your waypoints are still loading, try again in a moment.</yellow>"
 internal-error: "<red>Internal error, check the server log.</red>"
-player-only: "<red>Players only.</red>"
 usage-create: "<yellow>Usage: /wp create <name> [icon]</yellow>"
 usage-delete: "<yellow>Usage: /wp delete <name></yellow>"
 usage-rename: "<yellow>Usage: /wp rename <old> <new></yellow>"
@@ -29,7 +28,6 @@ waypoint-not-found: "<red>No waypoint named <name>.</red>"
 invalid-name: "<red>Names must match <gray>[A-Za-z0-9_-]{1,32}</gray>.</red>"
 name-taken: "<red>You already have a waypoint named <name>.</red>"
 limit-reached: "<red>You can only have <max> waypoints. Delete one first.</red>"
-invalid-icon: "<red>Unknown icon <icon>. Try: <hint>.</red>"
 world-missing: "<red>The world <world> for waypoint <name> is not loaded.</red>"
 
 # Teleport
@@ -47,7 +45,6 @@ share-not-found: "<red>No such share to remove.</red>"
 
 # Visibility
 visibility-set: "<green>Visibility for <scope> set to <state>.</green>"
-visibility-invalid-scope: "<red>Unknown scope. Use personal, global, shared or all.</red>"
 
 # Global
 global-created: "<green>Created global waypoint <name>.</green>"
