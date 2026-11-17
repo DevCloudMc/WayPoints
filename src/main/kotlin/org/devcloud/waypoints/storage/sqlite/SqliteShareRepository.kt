@@ -56,20 +56,6 @@ class SqliteShareRepository(private val pool: ConnectionPool) : ShareRepository 
             }
         }
 
-    override fun listSharesFor(id: WaypointId): CompletableFuture<List<WaypointShare>> =
-        pool.submit { c ->
-            c.prepareStatement("SELECT * FROM waypoint_shares WHERE waypoint_id = ?").use { ps ->
-                ps.setString(1, id.toString())
-                ps.executeQuery().use { rs ->
-                    val out = mutableListOf<WaypointShare>()
-                    while (rs.next()) {
-                        out += SqliteRowMappers.share(rs)
-                    }
-                    out
-                }
-            }
-        }
-
     override fun removeAllByOwner(owner: UUID): CompletableFuture<Int> = pool.submit { c ->
         c.prepareStatement(
                 """

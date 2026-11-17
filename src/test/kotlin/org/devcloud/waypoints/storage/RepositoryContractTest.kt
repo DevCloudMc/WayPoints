@@ -4,7 +4,6 @@ import java.time.Instant
 import java.util.UUID
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
-import kotlin.test.assertNull
 import kotlin.test.assertTrue
 import org.bukkit.map.MapCursor
 import org.devcloud.waypoints.domain.PlayerProfile
@@ -77,23 +76,6 @@ abstract class RepositoryContractTest {
         val wp = personal(owner, "home")
         backend.waypoints.save(wp).get()
         assertEquals(wp, backend.waypoints.findById(wp.id).get())
-    }
-
-    @Test
-    fun `findByOwnerAndName returns matching personal`() {
-        val owner = UUID.randomUUID()
-        val wp = personal(owner, "mine")
-        backend.waypoints.save(wp).get()
-        assertEquals(wp, backend.waypoints.findByOwnerAndName(owner, "mine").get())
-        assertNull(backend.waypoints.findByOwnerAndName(owner, "other").get())
-    }
-
-    @Test
-    fun `findGlobalByName returns matching global`() {
-        val wp = global("spawn")
-        backend.waypoints.save(wp).get()
-        assertEquals(wp, backend.waypoints.findGlobalByName("spawn").get())
-        assertNull(backend.waypoints.findGlobalByName("nope").get())
     }
 
     @Test

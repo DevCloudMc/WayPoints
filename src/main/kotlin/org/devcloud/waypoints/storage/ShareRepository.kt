@@ -12,7 +12,5 @@ interface ShareRepository {
 
     fun listSharedWith(target: UUID): CompletableFuture<List<WaypointShare>>
 
-    fun listSharesFor(id: WaypointId): CompletableFuture<List<WaypointShare>>
-
     fun removeAllByOwner(owner: UUID): CompletableFuture<Int>
 }
