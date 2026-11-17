@@ -90,6 +90,7 @@ class WaypointService(
         icon: MapCursor.Type,
         location: WaypointLocation,
         limit: Int,
+        approve: (Waypoint) -> Boolean = { true },
     ): CompletableFuture<Outcome<Waypoint, WaypointError>> {
         if (!nameRegex.matches(name)) {
             return done(Outcome.Err(WaypointError.InvalidName(name)))
@@ -112,6 +113,7 @@ class WaypointService(
                 WaypointScope.PERSONAL,
                 Instant.now(clock),
             )
+        if (!approve(wp)) return done(Outcome.Err(WaypointError.Cancelled))
         owned[name] = wp
         return persisted(storage.waypoints.save(wp), null, wp) {
             owned.remove(name, wp)
@@ -122,6 +124,7 @@ class WaypointService(
         name: String,
         icon: MapCursor.Type,
         location: WaypointLocation,
+        approve: (Waypoint) -> Boolean = { true },
     ): CompletableFuture<Outcome<Waypoint, WaypointError>> {
         if (!nameRegex.matches(name)) {
             return done(Outcome.Err(WaypointError.InvalidName(name)))
@@ -139,6 +142,7 @@ class WaypointService(
                 WaypointScope.GLOBAL,
                 Instant.now(clock),
             )
+        if (!approve(wp)) return done(Outcome.Err(WaypointError.Cancelled))
         globalCache[name] = wp
         return persisted(storage.waypoints.save(wp), null, wp) {
             globalCache.remove(name, wp)

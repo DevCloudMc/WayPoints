@@ -13,6 +13,7 @@ import org.devcloud.waypoints.command.CommandSupport
 import org.devcloud.waypoints.command.validator.IconValidator
 import org.devcloud.waypoints.command.validator.WaypointNameValidator
 import org.devcloud.waypoints.domain.WaypointLocation
+import org.devcloud.waypoints.domain.error.WaypointError
 import org.devcloud.waypoints.util.Outcome
 
 class GlobalCreateCommand(private val ctx: WayPointsBootstrap) {
@@ -31,27 +32,28 @@ class GlobalCreateCommand(private val ctx: WayPointsBootstrap) {
         val icon = p.getLast(MapCursor.Type::class.java)
         val name = p.get(String::class.java, p.size() - 2)
         val loc = WaypointLocation.of(player.location)
-        ctx.waypointService.createGlobal(name, icon, loc).thenAccept { res ->
-            ctx.async.runOnMain {
-                when (res) {
-                    is Outcome.Ok -> {
-                        if (
-                            !CommandSupport.callCancellable(WaypointCreateEvent(player, res.value))
-                        ) {
+        ctx.waypointService
+            .createGlobal(name, icon, loc) {
+                !CommandSupport.callCancellable(WaypointCreateEvent(player, it))
+            }
+            .thenAccept { res ->
+                ctx.async.runOnMain {
+                    when (res) {
+                        is Outcome.Ok ->
                             ctx.messenger.send(
                                 player,
                                 ctx.lang.message("global-created", "name" to name),
                             )
-                        } else {
-                            ctx.waypointService.deleteGlobal(name)
-                        }
-                    }
 
-                    is Outcome.Err -> {
-                        ctx.messenger.send(player, CommandSupport.renderError(ctx, res.error))
+                        is Outcome.Err ->
+                            if (res.error != WaypointError.Cancelled) {
+                                ctx.messenger.send(
+                                    player,
+                                    CommandSupport.renderError(ctx, res.error),
+                                )
+                            }
                     }
                 }
             }
-        }
     }
 }

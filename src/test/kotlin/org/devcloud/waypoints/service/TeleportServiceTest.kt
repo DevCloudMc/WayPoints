@@ -14,13 +14,13 @@ class TeleportServiceTest {
 
     @Test
     fun `no cooldown when never used`() {
-        val svc = TeleportService(Duration.ofSeconds(10), Clock.fixed(now, ZoneOffset.UTC))
+        val svc = TeleportService({ Duration.ofSeconds(10) }, Clock.fixed(now, ZoneOffset.UTC))
         assertEquals(Duration.ZERO, svc.remainingCooldown(UUID.randomUUID(), bypass = false))
     }
 
     @Test
     fun `cooldown remaining after use`() {
-        val svc = TeleportService(Duration.ofSeconds(10), Clock.fixed(now, ZoneOffset.UTC))
+        val svc = TeleportService({ Duration.ofSeconds(10) }, Clock.fixed(now, ZoneOffset.UTC))
         val uuid = UUID.randomUUID()
         svc.markUsed(uuid)
         val remaining = svc.remainingCooldown(uuid, bypass = false)
@@ -29,7 +29,7 @@ class TeleportServiceTest {
 
     @Test
     fun `bypass returns zero`() {
-        val svc = TeleportService(Duration.ofSeconds(10), Clock.fixed(now, ZoneOffset.UTC))
+        val svc = TeleportService({ Duration.ofSeconds(10) }, Clock.fixed(now, ZoneOffset.UTC))
         val uuid = UUID.randomUUID()
         svc.markUsed(uuid)
         assertEquals(Duration.ZERO, svc.remainingCooldown(uuid, bypass = true))

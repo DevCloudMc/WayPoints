@@ -13,6 +13,7 @@ import org.devcloud.waypoints.command.CommandSupport
 import org.devcloud.waypoints.command.validator.IconValidator
 import org.devcloud.waypoints.command.validator.WaypointNameValidator
 import org.devcloud.waypoints.domain.WaypointLocation
+import org.devcloud.waypoints.domain.error.WaypointError
 import org.devcloud.waypoints.util.Outcome
 import org.devcloud.waypoints.util.PermissionLimit
 
@@ -69,29 +70,28 @@ class CreateCommand(private val ctx: WayPointsBootstrap) {
             return
         }
         val loc = WaypointLocation.of(player.location)
-        ctx.waypointService.createPersonal(player.uniqueId, name, icon, loc, limit).thenAccept { res
-            ->
-            ctx.async.runOnMain {
-                when (res) {
-                    is Outcome.Ok -> {
-                        if (
-                            !CommandSupport.callCancellable(WaypointCreateEvent(player, res.value))
-                        ) {
+        ctx.waypointService
+            .createPersonal(player.uniqueId, name, icon, loc, limit) {
+                !CommandSupport.callCancellable(WaypointCreateEvent(player, it))
+            }
+            .thenAccept { res ->
+                ctx.async.runOnMain {
+                    when (res) {
+                        is Outcome.Ok ->
                             ctx.messenger.send(
                                 player,
                                 ctx.lang.message("waypoint-created", "name" to res.value.name),
                             )
-                        } else {
-                            // cancelled — roll back
-                            ctx.waypointService.deletePersonal(player.uniqueId, res.value.name)
-                        }
-                    }
 
-                    is Outcome.Err -> {
-                        ctx.messenger.send(player, CommandSupport.renderError(ctx, res.error))
+                        is Outcome.Err ->
+                            if (res.error != WaypointError.Cancelled) {
+                                ctx.messenger.send(
+                                    player,
+                                    CommandSupport.renderError(ctx, res.error),
+                                )
+                            }
                     }
                 }
             }
-        }
     }
 }

@@ -61,8 +61,20 @@ class TeleportCommand(private val ctx: WayPointsBootstrap) {
         if (CommandSupport.callCancellable(WaypointTeleportEvent(player, wp))) {
             return
         }
-        ctx.teleportService.markUsed(player.uniqueId)
-        ctx.messenger.send(player, ctx.lang.message("teleport-ok", "name" to wp.name))
-        player.teleport(resolved)
+        val teleport = {
+            ctx.teleportService.markUsed(player.uniqueId)
+            ctx.messenger.send(player, ctx.lang.message("teleport-ok", "name" to wp.name))
+            player.teleport(resolved)
+        }
+        val warmup = ctx.config.teleportWarmup.seconds
+        if (warmup <= 0) {
+            teleport()
+            return
+        }
+        ctx.messenger.send(
+            player,
+            ctx.lang.message("teleport-warmup", "seconds" to warmup.toString()),
+        )
+        ctx.teleportWarmups.start(player, warmup * 20) { teleport() }
     }
 }

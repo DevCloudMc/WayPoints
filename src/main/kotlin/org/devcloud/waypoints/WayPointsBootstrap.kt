@@ -13,6 +13,7 @@ import org.devcloud.waypoints.integration.bstats.BStatsBootstrap
 import org.devcloud.waypoints.integration.papi.WaypointsExpansion
 import org.devcloud.waypoints.listener.MinimapLifecycleListener
 import org.devcloud.waypoints.listener.PlayerLifecycleListener
+import org.devcloud.waypoints.listener.TeleportWarmupListener
 import org.devcloud.waypoints.messaging.Messenger
 import org.devcloud.waypoints.provider.WaypointWorldCursorProvider
 import org.devcloud.waypoints.service.ShareService
@@ -56,6 +57,12 @@ class WayPointsBootstrap(val module: WayPointsModule) {
     lateinit var async: Async
         private set
 
+    lateinit var teleportWarmups: TeleportWarmupListener
+        private set
+
+    private lateinit var api: WaypointsApi
+    private var expansion: WaypointsExpansion? = null
+
     private val hostPlugin: JavaPlugin by lazy { Cartographer.getInstance() }
 
     fun start() {
@@ -67,7 +74,7 @@ class WayPointsBootstrap(val module: WayPointsModule) {
         waypointService = WaypointService(storage)
         shareService = ShareService(storage)
         visibilityService = VisibilityService(storage)
-        teleportService = TeleportService(config.teleportCooldown)
+        teleportService = TeleportService({ config.teleportCooldown })
 
         waypointService.warmGlobals().get()
 
@@ -76,20 +83,24 @@ class WayPointsBootstrap(val module: WayPointsModule) {
                 waypointService,
                 shareService,
                 visibilityService,
-                config.hideLabelWithinBlocks,
-                config.labelDistanceDecimals,
-            )
+            ) {
+                config
+            }
 
         val playerListener =
             PlayerLifecycleListener(
                 waypointService,
                 shareService,
                 visibilityService,
-                teleportService,
                 module.logger,
             )
         module.registerListener(playerListener)
         module.registerListener(MinimapLifecycleListener(provider))
+        teleportWarmups =
+            TeleportWarmupListener(module::later, { config.teleportCancelOnMove }) {
+                messenger.send(it, lang.message("teleport-cancelled"))
+            }
+        module.registerListener(teleportWarmups)
 
         // Already-loaded minimaps won't fire MinimapLoadEvent again — register on them now.
         Cartographer.getInstance().mapManager.minimaps.values.forEach {
@@ -101,7 +112,7 @@ class WayPointsBootstrap(val module: WayPointsModule) {
             playerListener.warm(player.uniqueId)
         }
 
-        val api: WaypointsApi = WaypointsApiImpl(waypointService, shareService)
+        api = WaypointsApiImpl(waypointService, shareService)
         Bukkit.getServicesManager()
             .register(WaypointsApi::class.java, api, hostPlugin, ServicePriority.Normal)
 
@@ -111,20 +122,25 @@ class WayPointsBootstrap(val module: WayPointsModule) {
         BStatsBootstrap.start(hostPlugin, config)
 
         if (Bukkit.getPluginManager().isPluginEnabled("PlaceholderAPI")) {
-            WaypointsExpansion(waypointService, VERSION).register()
+            expansion = WaypointsExpansion(waypointService, VERSION).also { it.register() }
         }
     }
 
     fun stop() {
+        // Cartographer2 drops listeners and commands itself; these three it does not know about.
+        runCatching {
+            Cartographer.getInstance().mapManager.minimaps.values.forEach {
+                it.unregisterProvider(provider)
+            }
+        }
+        runCatching { Bukkit.getServicesManager().unregister(WaypointsApi::class.java, api) }
+        runCatching { expansion?.unregister() }
         runCatching { storage.close() }
     }
 
+    // storage.* is read once at startup; everything else is read on use.
     fun reload() {
         loadConfigs()
-        // Live-updating provider constants requires replacing the provider; caches remain valid.
-        // For 2.0 we only reload lang + config values that are read on each call (teleport cooldown
-        // from TeleportService
-        // is captured at construction, so a full reload requires a restart). Document this in help.
     }
 
     private fun loadConfigs() {

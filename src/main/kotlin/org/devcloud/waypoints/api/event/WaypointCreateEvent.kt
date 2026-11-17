@@ -7,8 +7,8 @@ import org.devcloud.waypoints.domain.Waypoint
 /**
  * Fired just before a new [Waypoint] is persisted and shown on the minimap.
  *
- * Cancelling the event rolls back the service-level cache write so the waypoint never becomes
- * visible, as if the player had never run the command.
+ * Cancelling the event stops the creation before anything is cached or written, as if the player
+ * had never run the command.
  *
  * ### Example — enforce a per-world block-list
  *

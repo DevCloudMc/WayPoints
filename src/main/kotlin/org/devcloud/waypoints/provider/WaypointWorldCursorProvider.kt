@@ -6,6 +6,7 @@ import io.github.bananapuncher714.cartographer.core.map.Minimap
 import io.github.bananapuncher714.cartographer.core.renderer.PlayerSetting
 import org.bukkit.Location
 import org.bukkit.entity.Player
+import org.devcloud.waypoints.config.ConfigSchema
 import org.devcloud.waypoints.domain.VisibilityState
 import org.devcloud.waypoints.domain.Waypoint
 import org.devcloud.waypoints.service.ShareService
@@ -17,8 +18,7 @@ class WaypointWorldCursorProvider(
     private val waypointService: WaypointService,
     private val shareService: ShareService,
     private val visibilityService: VisibilityService,
-    private val hideLabelWithinBlocks: Double,
-    private val labelDecimals: Int,
+    private val config: () -> ConfigSchema,
 ) : WorldCursorProvider {
     override fun getCursors(
         player: Player,
@@ -55,8 +55,12 @@ class WaypointWorldCursorProvider(
         val resolved = wp.location.resolve() ?: return
         val distance = WaypointDistanceService.horizontal(playerLoc, wp.location)
         val label =
-            if (distance != null && distance > hideLabelWithinBlocks) {
-                WaypointDistanceService.formatLabel(wp.name, distance, labelDecimals)
+            if (distance != null && distance > config().hideLabelWithinBlocks) {
+                WaypointDistanceService.formatLabel(
+                    wp.name,
+                    distance,
+                    config().labelDistanceDecimals,
+                )
             } else {
                 wp.name
             }

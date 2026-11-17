@@ -34,6 +34,8 @@ world-missing: "<red>The world <world> for waypoint <name> is not loaded.</red>"
 
 # Teleport
 teleport-ok: "<green>Teleporting to <name>...</green>"
+teleport-warmup: "<yellow>Teleporting in <seconds>s.</yellow>"
+teleport-cancelled: "<red>Teleport cancelled because you moved.</red>"
 teleport-cooldown: "<yellow>Wait <seconds>s before teleporting again.</yellow>"
 teleport-disabled: "<red>Teleport is disabled on this server.</red>"
 

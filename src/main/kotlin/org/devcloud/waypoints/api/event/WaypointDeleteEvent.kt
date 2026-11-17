@@ -8,8 +8,7 @@ import org.devcloud.waypoints.domain.Waypoint
  * Fired just before a [Waypoint] is removed from the cache and storage.
  *
  * Cancelling the event keeps the waypoint intact. Fires for both personal (`/wp delete`) and global
- * (`/wp global delete`) deletions, and for admin wipes (`/wp admin user <player> wipe` — fires once
- * per wiped waypoint).
+ * (`/wp global delete`) deletions. Admin wipes (`/wp admin user <player> wipe`) do not fire it.
  *
  * @see WaypointEvent
  * @since 3.0.0

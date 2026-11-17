@@ -200,7 +200,7 @@ Available events:
 - `WaypointDeleteEvent` (cancellable)
 - `WaypointRenameEvent` (cancellable)
 - `WaypointShareEvent` (cancellable)
-- `WaypointTeleportEvent` (cancellable, fires at teleport request, before warmup)
+- `WaypointTeleportEvent` (cancellable, fires at teleport request, before the warm-up delay)
 
 ---
 
