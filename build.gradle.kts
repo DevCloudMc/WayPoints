@@ -11,7 +11,7 @@ plugins {
 
 group = "org.devcloud"
 
-version = "4.0.0"
+version = "4.0.0-rc.1"
 
 java { toolchain.languageVersion.set(JavaLanguageVersion.of(25)) }
 
