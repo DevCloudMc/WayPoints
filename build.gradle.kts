@@ -48,6 +48,7 @@ dependencies {
 }
 
 tasks.processResources {
+    inputs.property("version", project.version)
     filesMatching("module.json") { expand("version" to project.version) }
 }
 
